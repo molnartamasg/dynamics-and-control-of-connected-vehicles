@@ -1,0 +1,20 @@
+bugs/unexpected behaviour:
+
+* p_topsol: branching off from Hopf with negative omega should use 
+  period=2*pi/abs(omega) (this is done), and conj(v) for the vector
+
+* correct_ini: calls sys_cond without checking extra_condition
+
+* p_stabil for fixed points: when eigenvalue is numerical Inf, it gets
+  removed (when delay is zero)
+
+* stst_stabil, l72: guard against no delay:
+if isempty(taumax) || taumax==0 || norm(cat(2,AA{2:end}),'inf')==0
+
+* remove struct2array from demos minimal_demo and neuron for octave compatibility, replace by eg, structfun(@(x)x, hoho_low.nmfm)
+annoying:
+
+* br_contn online plot always plots on current axis: fix axes and give
+  user option to set it
+
+* add optional two-point brackets for initialisation routines
