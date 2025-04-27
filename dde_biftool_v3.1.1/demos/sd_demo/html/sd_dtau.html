@@ -1,0 +1,254 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>User-provided partial derivatives of state-dependent delays</title><meta name="generator" content="MATLAB 7.14"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2014-04-02"><meta name="DC.source" content="sd_dtau.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+
+  </style></head><body><div class="content"><h1>User-provided partial derivatives of state-dependent delays</h1><!--introduction--><p>Implementation for tutorial demo neuron:</p><pre class="language-matlab"><span class="keyword">function</span> dtau=sd_dtau(k,xx,par,nx,np)
+</pre><p><b>Inputs</b></p><div><ul><li><tt>k</tt> (integer): the index k of the delay for which the derivative is requested</li><li><tt>xx</tt> (array with <tt>sys_ntau()</tt>+1 columns): values of states <img src="sd_dtau_eq28383.png" alt="$[x(t),\ldots,x(t-\tau_k),\ldots,x(t-\tau_n)]$"></li><li><tt>par</tt>: row vector of system parameters</li><li><tt>nx</tt> (integer or vector of two integers): index wrt which element of <tt>xx</tt> <img src="sd_dtau_eq51658.png" alt="$\tau_k$"> has to be differentiated</li><li><tt>np</tt> (integer): index wrt to which element of <tt>par</tt> <img src="sd_dtau_eq51658.png" alt="$\tau_k$"> has to be differentiated</li></ul></div><p><b>Output</b> <tt>dtau</tt>: partial derivative of <img src="sd_dtau_eq51658.png" alt="$\tau_k$"> wrt</p><div><ul><li><tt>xx(:,nx)</tt> if nx is scalar and np is empty (<tt>dtau</tt> is row vector of length <tt>size(xx,1)</tt>),</li><li><tt>par(:,np)</tt> if nx is empty and np is scalar (<tt>dtau</tt> is scalar),</li><li><tt>xx(:,nx(1))</tt> and <tt>xx(nx(2) if nx has length2 and np is empty (|dtau</tt> is square matrix of <tt>size(xx,1)</tt>),</li><li><tt>xx(:,nx(1))</tt> and <tt>par(np if nx and np have length 1  (|dtau</tt> is row vector of length <tt>size(xx,1)</tt>).</li></ul></div><p>If a user-provided function <tt>sys_dtau</tt> is not provided, DDE-Biftool will use finite-difference approximation (implemented in <tt>df_derit.m</tt>).</p><p>
+% (c) DDE-BIFTOOL v. 3.1.1(20), 11/04/2014
+</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#3">Parameter vector</a></li><li><a href="#4">first order derivatives wrt state variables:</a></li><li><a href="#6">First order derivatives wrt parameters</a></li><li><a href="#8">Second order derivatives wrt state variables</a></li><li><a href="#10">Mixed state parameter derivatives</a></li><li><a href="#12">Otherwise raise error</a></li></ul></div><pre class="codeinput"><span class="keyword">function</span> dtau=sd_dtau(delay_nr,xx,par,nx,np)
+</pre><h2>Parameter vector<a name="3"></a></h2><p>p1 p2 p3 p4 p5 p6 p7 p8 p9 p10 p11</p><pre class="codeinput">n=size(xx,1);
+nvec=size(xx,3);
+<span class="keyword">if</span> length(nx)==1 &amp;&amp; isempty(np)
+</pre><h2>first order derivatives wrt state variables:<a name="4"></a></h2><pre class="codeinput">    dtau=zeros(1,n,nvec);
+    <span class="keyword">if</span> nx==0 <span class="comment">% derivative wrt x(t)</span>
+        <span class="keyword">if</span> delay_nr==3
+            dtau(1,2,:)=par(5)*par(10)*xx(2,2,:);
+        <span class="keyword">elseif</span> delay_nr==4
+            dtau(1,1,:)=xx(2,3,:)./(1+xx(1,1,:).*xx(2,3,:)).^2;
+        <span class="keyword">elseif</span> delay_nr==5
+            dtau(1,4,:)=1;
+        <span class="keyword">elseif</span> delay_nr==6
+            dtau(1,5,:)=1;
+        <span class="keyword">end</span>
+    <span class="keyword">elseif</span> nx==1 <span class="comment">% derivative wrt x(t-tau1)</span>
+        <span class="keyword">if</span> delay_nr==3
+            dtau(1,2,:)=par(5)*par(10)*xx(2,1,:);
+        <span class="keyword">end</span>
+    <span class="keyword">elseif</span> nx==2 <span class="comment">% derivative wrt x(t-tau2)</span>
+        <span class="keyword">if</span> delay_nr==4
+            dtau(1,2,:)=xx(1,1,:)./(1+xx(1,1,:).*xx(2,3,:)).^2;
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+</pre><pre class="codeinput"><span class="keyword">elseif</span> isempty(nx) &amp;&amp; length(np)==1,
+</pre><h2>First order derivatives wrt parameters<a name="6"></a></h2><pre class="codeinput">    dtau=zeros(1,nvec);
+    <span class="keyword">if</span> delay_nr==1 &amp;&amp; np==10
+        dtau(1,:)=1;
+    <span class="keyword">elseif</span> delay_nr==2 &amp;&amp; np==11
+        dtau(1,:)=1;
+    <span class="keyword">elseif</span> delay_nr==3 &amp;&amp; np==5
+        dtau(1,:)=par(10)*xx(2,1,:).*xx(2,2,:);
+    <span class="keyword">elseif</span> delay_nr==3 &amp;&amp; np==10
+        dtau(1,:)=par(5)*xx(2,1,:).*xx(2,2,:);
+    <span class="keyword">end</span>
+</pre><pre class="codeinput"><span class="keyword">elseif</span> length(nx)==2 &amp;&amp; isempty(np),
+</pre><h2>Second order derivatives wrt state variables<a name="8"></a></h2><pre class="codeinput">    dtau=zeros(n,n,nvec);
+    <span class="keyword">if</span> delay_nr==3
+        <span class="keyword">if</span> (nx(1)==0 &amp;&amp; nx(2)==1) || (nx(1)==1 &amp;&amp; nx(2)==0)
+            dtau(2,2,:)=par(5)*par(10);
+        <span class="keyword">end</span>
+    <span class="keyword">elseif</span> delay_nr==4
+        <span class="keyword">if</span> nx(1)==0 &amp;&amp; nx(2)==0
+            dtau(1,1,:)=-2*xx(2,3,:).*xx(2,3,:)./(1+xx(1,1,:)*xx(2,2,:)).^3;
+        <span class="keyword">elseif</span> nx(1)==0 &amp;&amp; nx(2)==2
+            dtau(1,2,:)=(1-xx(1,1,:).*xx(2,3,:))./(1+xx(1,1,:).*xx(2,2,:)).^3;
+        <span class="keyword">elseif</span> nx(1)==2 &amp;&amp; nx(2)==0
+            dtau(2,1,:)=(1-xx(1,1,:).*xx(2,3,:))./(1+xx(1,1,:).*xx(2,2,:)).^3;
+        <span class="keyword">elseif</span> nx(1)==2 &amp;&amp; nx(2)==2
+            dtau(2,2,:)=-2*xx(1,1,:).*xx(1,1,:)./(1+xx(1,1,:).*xx(2,2,:)).^3;
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+</pre><pre class="codeinput"><span class="keyword">elseif</span> length(nx)==1 &amp;&amp; length(np)==1,
+</pre><h2>Mixed state parameter derivatives<a name="10"></a></h2><pre class="codeinput">    dtau=zeros(1,n,nvec);
+    <span class="keyword">if</span> delay_nr==3
+        <span class="keyword">if</span> nx==0 &amp;&amp; np==5
+            dtau(1,2,:)=par(10)*xx(2,2,:);
+        <span class="keyword">elseif</span> nx==0 &amp;&amp; np==10
+            dtau(1,2,:)=par(5)*xx(2,2,:);
+        <span class="keyword">elseif</span> nx==1 &amp;&amp; np==5
+            dtau(1,2,:)=par(10)*xx(2,1,:);
+        <span class="keyword">elseif</span> nx==1 &amp;&amp; np==10
+            dtau(1,2,:)=par(5)*xx(2,1,:);
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+</pre><pre class="codeinput"><span class="keyword">end</span>
+</pre><h2>Otherwise raise error<a name="12"></a></h2><p>Raise error if the requested derivative does not exist</p><pre class="codeinput"><span class="keyword">if</span> isempty(dtau)
+    error([<span class="string">'SYS_DTAU, delay %d: requested derivative '</span>,<span class="keyword">...</span>
+        <span class="string">'nx=%d, np=%d does not exist!'</span>],delay_nr, nx, np);
+<span class="keyword">end</span>
+</pre><pre class="codeinput"><span class="keyword">end</span>
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.14<br></p></div><!--
+##### SOURCE BEGIN #####
+%% User-provided partial derivatives of state-dependent delays
+% Implementation for tutorial demo neuron:
+%
+%   function dtau=sd_dtau(k,xx,par,nx,np)
+%
+% *Inputs*
+% 
+% * |k| (integer): the index k of the delay for which the derivative
+% is requested
+% * |xx| (array with |sys_ntau()|+1 columns): values of states
+% $[x(t),\ldots,x(t-\tau_k),\ldots,x(t-\tau_n)]$
+% * |par|: row vector of system parameters
+% * |nx| (integer or vector of two integers): index wrt which element of
+% |xx| $\tau_k$ has to be differentiated
+% * |np| (integer): index wrt to which element of |par| $\tau_k$ has to be
+% differentiated
+%
+% *Output*
+% |dtau|: partial derivative of $\tau_k$ wrt
+%
+% * |xx(:,nx)| if nx is scalar and np is empty (|dtau| is row vector of
+% length |size(xx,1)|),
+% * |par(:,np)| if nx is empty and np is scalar (|dtau| is scalar),
+% * |xx(:,nx(1))| and |xx(nx(2) if nx has length2 and np is empty (|dtau|
+% is square matrix of |size(xx,1)|),
+% * |xx(:,nx(1))| and |par(np if nx and np have length 1  (|dtau| is row
+% vector of length |size(xx,1)|).
+%
+% If a user-provided function |sys_dtau| is not provided, DDE-Biftool will
+% use finite-difference approximation (implemented in |df_derit.m|).
+%
+% <html>
+% $Id: sd_dtau.html 20 2014-04-11 19:27:33Z jan.sieber $
+% </html>
+%
+%%
+function dtau=sd_dtau(delay_nr,xx,par,nx,np)
+
+%% Parameter vector
+% p1 p2 p3 p4 p5 p6 p7 p8 p9 p10 p11
+
+n=size(xx,1);
+nvec=size(xx,3);
+if length(nx)==1 && isempty(np)
+    %% first order derivatives wrt state variables:
+    dtau=zeros(1,n,nvec);
+    if nx==0 % derivative wrt x(t)
+        if delay_nr==3
+            dtau(1,2,:)=par(5)*par(10)*xx(2,2,:);
+        elseif delay_nr==4
+            dtau(1,1,:)=xx(2,3,:)./(1+xx(1,1,:).*xx(2,3,:)).^2;
+        elseif delay_nr==5
+            dtau(1,4,:)=1;
+        elseif delay_nr==6
+            dtau(1,5,:)=1;
+        end
+    elseif nx==1 % derivative wrt x(t-tau1)
+        if delay_nr==3
+            dtau(1,2,:)=par(5)*par(10)*xx(2,1,:);
+        end
+    elseif nx==2 % derivative wrt x(t-tau2)
+        if delay_nr==4
+            dtau(1,2,:)=xx(1,1,:)./(1+xx(1,1,:).*xx(2,3,:)).^2;
+        end
+    end
+elseif isempty(nx) && length(np)==1,
+    %% First order derivatives wrt parameters
+    dtau=zeros(1,nvec);
+    if delay_nr==1 && np==10
+        dtau(1,:)=1;
+    elseif delay_nr==2 && np==11
+        dtau(1,:)=1;
+    elseif delay_nr==3 && np==5
+        dtau(1,:)=par(10)*xx(2,1,:).*xx(2,2,:);
+    elseif delay_nr==3 && np==10
+        dtau(1,:)=par(5)*xx(2,1,:).*xx(2,2,:);
+    end
+elseif length(nx)==2 && isempty(np),
+    %% Second order derivatives wrt state variables
+    dtau=zeros(n,n,nvec);
+    if delay_nr==3
+        if (nx(1)==0 && nx(2)==1) || (nx(1)==1 && nx(2)==0)
+            dtau(2,2,:)=par(5)*par(10);
+        end
+    elseif delay_nr==4
+        if nx(1)==0 && nx(2)==0
+            dtau(1,1,:)=-2*xx(2,3,:).*xx(2,3,:)./(1+xx(1,1,:)*xx(2,2,:)).^3;
+        elseif nx(1)==0 && nx(2)==2
+            dtau(1,2,:)=(1-xx(1,1,:).*xx(2,3,:))./(1+xx(1,1,:).*xx(2,2,:)).^3;
+        elseif nx(1)==2 && nx(2)==0
+            dtau(2,1,:)=(1-xx(1,1,:).*xx(2,3,:))./(1+xx(1,1,:).*xx(2,2,:)).^3;
+        elseif nx(1)==2 && nx(2)==2
+            dtau(2,2,:)=-2*xx(1,1,:).*xx(1,1,:)./(1+xx(1,1,:).*xx(2,2,:)).^3;
+        end
+    end
+elseif length(nx)==1 && length(np)==1,
+    %% Mixed state parameter derivatives
+    dtau=zeros(1,n,nvec);
+    if delay_nr==3
+        if nx==0 && np==5
+            dtau(1,2,:)=par(10)*xx(2,2,:);
+        elseif nx==0 && np==10
+            dtau(1,2,:)=par(5)*xx(2,2,:);
+        elseif nx==1 && np==5
+            dtau(1,2,:)=par(10)*xx(2,1,:);
+        elseif nx==1 && np==10
+            dtau(1,2,:)=par(5)*xx(2,1,:);
+        end
+    end
+end
+%% Otherwise raise error
+% Raise error if the requested derivative does not exist
+if isempty(dtau)
+    error(['SYS_DTAU, delay %d: requested derivative ',...
+        'nx=%d, np=%d does not exist!'],delay_nr, nx, np);
+end
+end
+
+##### SOURCE END #####
+--></body></html>

@@ -1,0 +1,143 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Definition of user functions</title><meta name="generator" content="MATLAB 7.14"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2014-04-10"><meta name="DC.source" content="sd_demo_funcs.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+
+  </style></head><body><div class="content"><h1>Definition of user functions</h1><!--introduction--><p>(Please load <tt>ddebiftoool</tt> into path first, see <a href="sd_demo.html">sd_demo.html</a>.) The functions for right-hand side <tt>sys_rhs</tt> and its derivative <tt>sys_deri</tt> have the same format as in the case of constant delays, see <a href="../../neuron/html/demo1_funcs.html">../../neuron/html/demo1_funcs.html</a>.</p><p>
+% (c) DDE-BIFTOOL v. 3.1.1(20), 11/04/2014
+</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Specification of state-dependent delays</a></li><li><a href="#2">The number of delays</a></li><li><a href="#3">Assignment of user function fields</a></li><li><a href="#4">Save and continue to continuation and stability of steady states <a href="sd_demo_stst.html">sd_demo_stst.html</a></a></li></ul></div><h2>Specification of state-dependent delays<a name="1"></a></h2><p>The function <tt>sys_tau</tt> returns the value of the delay. <b>This is in contrast to</b> the definition of <tt>sys_tau</tt> for constant delays, where the delay's <i>position</i> in the parameter list is returned. For state-dependent delays, the header of the function <tt>sys_tau</tt>, defining the delays, has the format (see <a href="sd_tau.html">sd_tau.html</a> for the demo example):</p><pre class="language-matlab"><span class="keyword">function</span> tau=sys_tau(k,xx,par)
+</pre><p>it defines the <tt>k</tt> th delay <img src="sd_demo_funcs_eq51658.png" alt="$\tau_k$">, which is allowed to depend on <tt>xx(:,1:k)</tt> (the states <img src="sd_demo_funcs_eq43635.png" alt="$x(t)$">,..., <img src="sd_demo_funcs_eq91516.png" alt="$x(t-\tau_{k-1})$">) and the parameter <tt>par</tt>. This definition of delays permits the user to create arbitrary levels of nesting. Note that, when <tt>sys_tau</tt> is called with first argument <tt>k</tt>, its second argument <tt>xx</tt> has column dimension <tt>k</tt>.</p><p><b>Note</b> The order of the delays corresponds to the order in which they appear in <tt>xx</tt> as passed to the functions <tt>sys_rhs</tt> and <tt>sys_deri</tt>.</p><p>Optionally, the user is encouraged to provide a function that  supplies derivatives of all delays with respect to the state and parameters. Its functionality is similar to the function <tt>sys_deri</tt>. Its header has the format</p><pre class="language-matlab"><span class="keyword">function</span> dtau=sys_dtau(delay_nr,xx,par,nx,np)
+</pre><p>Its format is similar to <tt>sys_deri</tt>. The result <tt>dtau</tt> is a scalar, vector or matrix of partial derivatives of the delay with number <tt>delay_nr</tt> which depends on the type of derivative requested via <tt>nx</tt> and <tt>np</tt>. See <a href="sd_dtau.html">sd_dtau.html</a> for an example.</p><h2>The number of delays<a name="2"></a></h2><p>For systems with state-dependent delays DDE-Biftool requires a separate function that provides the number of delays:</p><pre class="language-matlab"><span class="keyword">function</span> n=sys_ntau()
+</pre><p>returns the number <tt>n</tt> of delays. Accordingly, the argument <tt>xx</tt> of the right-hand side <tt>sys_rhs</tt> will have the column dimension <tt>n+1</tt>. The corresponding field in the array <tt>funcs</tt> defining the user functions is named <tt>'sys_ntau'</tt>.</p><h2>Assignment of user function fields<a name="3"></a></h2><p>The functions can have arbitrary names or can be anonymous. The above names are the field names in the structure containing th euser functions. Assign these fields automatically using <tt>set_funcs</tt>. Note that the flag <tt>tp_del</tt> is set to 1 for state-dependent delays. This is determined inside <tt>set_funcs</tt> using a try-catch enclosed call <tt>sys_tau()</tt>.</p><pre class="codeinput">funcs=set_funcs(<span class="string">'sys_rhs'</span>,@sd_rhs,<span class="string">'sys_tau'</span>,@sd_tau,<span class="keyword">...</span>
+    <span class="string">'sys_ntau'</span>,@()6,<span class="string">'sys_deri'</span>,@sd_deri,<span class="string">'sys_dtau'</span>,@sd_dtau,<span class="string">'x_vectorized'</span>,true) <span class="comment">%#ok&lt;NOPTS&gt;</span>
+</pre><pre class="codeoutput">funcs = 
+              sys_rhs: [function_handle]
+             sys_ntau: @()6
+              sys_tau: [function_handle]
+             sys_cond: @dummy_cond
+             sys_deri: @(x,p,nx,np,v)wrap_deri(x,p,nx,np,v,funcs.sys_deri)
+             sys_dtau: [function_handle]
+         x_vectorized: 1
+               tp_del: 1
+    sys_deri_provided: 1
+    sys_dtau_provided: 1
+</pre><h2>Save and continue to continuation and stability of steady states <a href="sd_demo_stst.html">sd_demo_stst.html</a><a name="4"></a></h2><pre class="codeinput">save(<span class="string">'sd_demo_funcs'</span>);
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.14<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Definition of user functions
+% (Please load |ddebiftoool| into path first, see <sd_demo.html>.)
+% The functions for right-hand side |sys_rhs| and its derivative |sys_deri|
+% have the same format as in the case of constant delays, see
+% <../../neuron/html/demo1_funcs.html>. 
+%
+% <html>
+% $Id: sd_demo_funcs.html 20 2014-04-11 19:27:33Z jan.sieber $
+% </html>
+%
+%% Specification of state-dependent delays
+% The function |sys_tau| returns the value of the delay. *This is in
+% contrast to* the definition of |sys_tau| for constant delays, where the
+% delay's _position_ in the parameter list is returned. For
+% state-dependent delays, the header of the function |sys_tau|, defining the
+% delays, has the format (see <sd_tau.html> for the demo example):
+%
+%   function tau=sys_tau(k,xx,par)
+%
+% it defines the |k| th delay $\tau_k$, which is allowed to depend on
+% |xx(:,1:k)| (the states $x(t)$,..., $x(t-\tau_{k-1})$) and the parameter
+% |par|. This definition of delays permits the user to create arbitrary
+% levels of nesting. Note that, when |sys_tau| is called with first
+% argument |k|, its second argument |xx| has column dimension |k|.
+%
+% *Note* The order of the delays corresponds to the order
+% in which they appear in |xx| as passed to
+% the functions |sys_rhs| and |sys_deri|.
+%
+% Optionally, the user is encouraged to provide a function that  supplies
+% derivatives of all delays with respect to the state and parameters. Its functionality is similar to the function
+% |sys_deri|. Its header has the format 
+%
+%   function dtau=sys_dtau(delay_nr,xx,par,nx,np)
+%
+% Its format is similar to |sys_deri|. The result |dtau| is a scalar,
+% vector or matrix of partial derivatives of the delay with number
+% |delay_nr| which depends on the type of derivative requested via
+% |nx| and |np|. See <sd_dtau.html> for an example.
+
+%% The number of delays
+% For systems with state-dependent delays DDE-Biftool requires a separate
+% function that provides the number of delays:
+%
+%   function n=sys_ntau()
+%
+% returns the number |n| of delays. Accordingly, the argument |xx| of
+% the right-hand side |sys_rhs| will have the column dimension |n+1|. The
+% corresponding field in the array |funcs| defining the user functions is
+% named |'sys_ntau'|.
+
+%% Assignment of user function fields
+% The functions can have arbitrary names or can be anonymous. The above
+% names are the field names in the structure containing th euser functions.
+% Assign these fields automatically using |set_funcs|. Note that the flag
+% |tp_del| is set to 1 for state-dependent delays. This is determined
+% inside |set_funcs| using a try-catch enclosed call |sys_tau()|.
+funcs=set_funcs('sys_rhs',@sd_rhs,'sys_tau',@sd_tau,...
+    'sys_ntau',@()6,'sys_deri',@sd_deri,'sys_dtau',@sd_dtau,'x_vectorized',true) %#ok<NOPTS>
+%% Save and continue to continuation and stability of steady states <sd_demo_stst.html>
+save('sd_demo_funcs');
+
+##### SOURCE END #####
+--></body></html>

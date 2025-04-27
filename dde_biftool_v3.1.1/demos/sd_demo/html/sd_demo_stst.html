@@ -1,0 +1,227 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>sd_demo_stst</title><meta name="generator" content="MATLAB 7.14"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2014-04-10"><meta name="DC.source" content="sd_demo_stst.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Continuation and stability of Equilibria for state-dependent delays</a></li><li><a href="#2">Initial guess for steady state</a></li><li><a href="#3">Construction of initial piece of branch</a></li><li><a href="#4">Continuation of equilibria</a></li><li><a href="#5">Figure: branch of equilibria</a></li><li><a href="#6">Stability of equilibria and eigenvalues of linearization</a></li><li><a href="#7">Figure: Eigenvalues of linearization along branch</a></li><li><a href="#8">Save results and continue with Hopf bifurcations</a></li></ul></div><h2>Continuation and stability of Equilibria for state-dependent delays<a name="1"></a></h2><p>Once the user-defined functions are prepared, DDE-Biftool can compute and continue equilibria of the DDE, and compute their linearized stability, thus detecting local bifurcations. This demo requires <a href="sd_demo_funcs.html">sd_demo_funcs.html</a> to have run beforehand.</p><p>
+% (c) DDE-BIFTOOL v. 3.1.1(20), 11/04/2014
+</p><pre class="codeinput"><span class="comment">%#ok&lt;*ASGLU,*NOPTS,*NASGU&gt;</span>
+<span class="comment">%</span>
+</pre><h2>Initial guess for steady state<a name="2"></a></h2><p>We define a steady state solution using the parameter values listed in <tt>stst.parameter</tt> and an initial guess in <tt>stst.x</tt>. Then we get default point method parameters and correct the point,</p><pre class="codeinput">stst.kind=<span class="string">'stst'</span>;
+stst.parameter=[4.5 0.04 -1.4 6 -0.45 -0.01 3 0.3 0.1 1 0.2];
+stst.x=[1.4 1.5 -25 0.6 1.4]';
+<span class="comment">% get default method parameters for stst calculations:</span>
+method=df_mthod(funcs,<span class="string">'stst'</span>);
+<span class="comment">% correct the point:</span>
+[stst,success]=p_correc(funcs,stst,[],[],method.point)
+stst.x
+</pre><pre class="codeoutput">stst = 
+         kind: 'stst'
+    parameter: [1x11 double]
+            x: [5x1 double]
+success =
+     1
+ans =
+    1.4134
+    1.5193
+  -25.1077
+    0.5886
+    1.3801
+</pre><h2>Construction of initial piece of branch<a name="3"></a></h2><p>We will use this point as a first point to compute a branch of steady state solutions. First, we obtain an empty branch with free parameter <img src="sd_demo_stst_eq36293.png" alt="$p_5$">. To obtain a second starting point we change parameter value <img src="sd_demo_stst_eq36293.png" alt="$p_5$"> slightly and correct again.</p><pre class="codeinput">branch1=df_brnch(funcs,5,<span class="string">'stst'</span>);
+branch1.parameter.min_bound(1,:)=[5 -1]; <span class="comment">% lower and</span>
+branch1.parameter.max_bound(1,:)=[5 1];  <span class="comment">% upper bound for p_5</span>
+branch1.parameter.max_step(1,:)=[5 0.1]; <span class="comment">% max predictor step along branch</span>
+
+branch1.point=stst;  <span class="comment">% use stst as a first branch point</span>
+
+stst.parameter(5)=stst.parameter(5)-0.01;                <span class="comment">% perturb and</span>
+[stst,success]=p_correc(funcs,stst,[],[],method.point);  <span class="comment">% correct again</span>
+
+branch1.point(2)=stst; <span class="comment">% and use as a second branch point</span>
+</pre><h2>Continuation of equilibria<a name="4"></a></h2><p>With two starting points and suitable method parameters we continue the branch (with plotting) versus parameter <img src="sd_demo_stst_eq36293.png" alt="$p_5$">, see figure below. During continuation, seven points were successfully computed before the state-dependent delay function <img src="sd_demo_stst_eq91063.png" alt="$\tau_3$"> crossed zero (signalled by a warning). The computed point with <img src="sd_demo_stst_eq28374.png" alt="$\tau_3<0$"> was not accepted. Instead, the point corresponding to <img src="sd_demo_stst_eq64236.png" alt="$\tau_3=0$"> was computed, see figure below. We check the value of <img src="sd_demo_stst_eq91063.png" alt="$\tau_3$"> at the last point in the branch using function <tt>p_tau</tt>.</p><p>In similar cases, it might happen that the computed value of a delay is a very small negative value. Because stability cannot be computed when there are negative delays, small negative delay values are automatically neglected when their value is larger than the value defined in the field <tt>method.stability.delay_accuracy</tt>.</p><pre class="codeinput">figure(1); clf;
+[branch1,s,f,r]=br_contn(funcs,branch1,20) <span class="comment">% continue with plotting the branch</span>
+plot(branch1.point(end).parameter(5),branch1.point(end).x(1),<span class="string">'o'</span>);
+xlabel(<span class="string">'p5'</span>);ylabel(<span class="string">'x(1)'</span>);
+p_tau(funcs,branch1.point(end),3)
+</pre><pre class="codeoutput">BR_CONTN warning: delay number_3 becomes negative.
+branch1 = 
+       method: [1x1 struct]
+    parameter: [1x1 struct]
+        point: [1x9 struct]
+s =
+     8
+f =
+     0
+r =
+     0
+ans =
+   2.2204e-16
+</pre><img vspace="5" hspace="5" src="sd_demo_stst_01.png" alt=""> <h2>Figure: branch of equilibria<a name="5"></a></h2><p>Output of <tt>br_contn</tt>: predictions and corrections after computation of a branch of steady state solutions versus parameter <img src="sd_demo_stst_eq36293.png" alt="$p_5$">. <tt>o</tt> - the last computed point in the branch (corresponding to <img src="sd_demo_stst_eq64236.png" alt="$\tau_3=0$">)</p><h2>Stability of equilibria and eigenvalues of linearization<a name="6"></a></h2><p>We compute the stability along the branch and after obtaining suitable measure structures we plot the real part of the corrected roots of the characteristic equation along the branch versus the point numbers, see figure below. From this figure it is not clear which real parts correspond to real roots respectively complex pairs of roots. We check point 5,</p><pre class="codeinput">branch1.method.stability.minimal_real_part=-1;
+branch1=br_stabl(funcs,branch1,0,0);
+
+<span class="comment">% obtain suitable scalar measures to plot stability along branch:</span>
+[xm,ym]=df_measr(1,branch1);
+ym.subfield=<span class="string">'l1'</span>;
+
+figure(2); clf;
+br_plot(branch1,[],ym,<span class="string">'b'</span>);   <span class="comment">% stability along branch versus point number</span>
+br_plot(branch1,[],ym,<span class="string">'b.'</span>);
+plot([0 10],[0 0],<span class="string">'-.'</span>);      <span class="comment">% axis</span>
+branch1.point(5).stability.l1 <span class="comment">% stability of point 5</span>
+xlabel(<span class="string">'point number'</span>);ylabel(<span class="string">'\Re(\lambda)'</span>);
+</pre><pre class="codeoutput">ans =
+  -0.0023 + 0.5488i
+  -0.0023 - 0.5488i
+  -0.0952          
+  -0.4499          
+</pre><img vspace="5" hspace="5" src="sd_demo_stst_02.png" alt=""> <h2>Figure: Eigenvalues of linearization along branch<a name="7"></a></h2><p>Real parts of the corrected roots of the characteristic equation along the branch.</p><h2>Save results and continue with Hopf bifurcations<a name="8"></a></h2><p>The file <a href="sd_demo_hopf.html">sd_demo_hopf.html</a> shows how to detect and continue Hopf bifurcations.</p><pre class="codeinput">save(<span class="string">'sd_demo_stst'</span>);
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.14<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Continuation and stability of Equilibria for state-dependent delays
+% Once the user-defined functions are prepared, DDE-Biftool can compute and
+% continue equilibria of the DDE, and compute their linearized stability,
+% thus detecting local bifurcations. This demo requires <sd_demo_funcs.html> to
+% have run beforehand.
+%
+% <html>
+% $Id: sd_demo_stst.html 20 2014-04-11 19:27:33Z jan.sieber $
+% </html>
+%
+%#ok<*ASGLU,*NOPTS,*NASGU>
+%
+%% Initial guess for steady state
+% We define a steady state solution using the parameter values listed in
+% |stst.parameter| and an initial guess in |stst.x|. Then we get default
+% point method parameters and correct the point,
+stst.kind='stst';
+stst.parameter=[4.5 0.04 -1.4 6 -0.45 -0.01 3 0.3 0.1 1 0.2];
+stst.x=[1.4 1.5 -25 0.6 1.4]';
+% get default method parameters for stst calculations:
+method=df_mthod(funcs,'stst');
+% correct the point:
+[stst,success]=p_correc(funcs,stst,[],[],method.point)
+stst.x
+%% Construction of initial piece of branch
+% We will use this point as a first point to compute a branch of steady
+% state solutions. First, we obtain an empty branch with free parameter
+% $p_5$. To obtain a second starting point we change parameter value $p_5$
+% slightly and correct again.
+branch1=df_brnch(funcs,5,'stst');
+branch1.parameter.min_bound(1,:)=[5 -1]; % lower and
+branch1.parameter.max_bound(1,:)=[5 1];  % upper bound for p_5
+branch1.parameter.max_step(1,:)=[5 0.1]; % max predictor step along branch   
+
+branch1.point=stst;  % use stst as a first branch point
+
+stst.parameter(5)=stst.parameter(5)-0.01;                % perturb and
+[stst,success]=p_correc(funcs,stst,[],[],method.point);  % correct again
+
+branch1.point(2)=stst; % and use as a second branch point
+%% Continuation of equilibria
+% With two starting points and suitable method parameters
+% we continue the branch (with plotting) versus parameter $p_5$,
+% see figure below. During continuation, seven points were successfully computed
+% before the state-dependent delay function $\tau_3$ crossed zero
+% (signalled by a warning). The computed point with $\tau_3<0$ was not
+% accepted. Instead, the point corresponding to $\tau_3=0$ was computed,
+% see figure below. We check the value of $\tau_3$ at the
+% last point in the branch using function |p_tau|.
+%
+% In similar cases, it might happen that the computed value of a delay is 
+% a very small negative value. Because stability cannot be computed when
+% there are negative delays, small negative delay values are automatically
+% neglected when their value is larger than the value defined in the field
+% |method.stability.delay_accuracy|.
+figure(1); clf;
+[branch1,s,f,r]=br_contn(funcs,branch1,20) % continue with plotting the branch
+plot(branch1.point(end).parameter(5),branch1.point(end).x(1),'o');
+xlabel('p5');ylabel('x(1)');
+p_tau(funcs,branch1.point(end),3)
+%% Figure: branch of equilibria
+% Output of |br_contn|: predictions and corrections
+% after computation of a branch of steady state solutions versus parameter
+% $p_5$. |o| - the last computed point in the branch (corresponding to
+% $\tau_3=0$)
+%% Stability of equilibria and eigenvalues of linearization
+% We compute the stability along the branch and after obtaining suitable
+% measure structures we plot the real part of the corrected roots of the
+% characteristic equation along the branch versus the point numbers, see
+% figure below. From this figure it is not clear which real parts
+% correspond to real roots respectively complex pairs of roots. We check
+% point 5,
+
+branch1.method.stability.minimal_real_part=-1;
+branch1=br_stabl(funcs,branch1,0,0);
+
+% obtain suitable scalar measures to plot stability along branch:
+[xm,ym]=df_measr(1,branch1);
+ym.subfield='l1';
+
+figure(2); clf;
+br_plot(branch1,[],ym,'b');   % stability along branch versus point number
+br_plot(branch1,[],ym,'b.');
+plot([0 10],[0 0],'-.');      % axis
+branch1.point(5).stability.l1 % stability of point 5
+xlabel('point number');ylabel('\Re(\lambda)');
+%% Figure: Eigenvalues of linearization along branch
+% Real parts of the corrected roots of the characteristic equation along
+% the branch.
+%% Save results and continue with Hopf bifurcations
+% The file <sd_demo_hopf.html> shows how to detect and continue Hopf
+% bifurcations.
+save('sd_demo_stst');
+##### SOURCE END #####
+--></body></html>

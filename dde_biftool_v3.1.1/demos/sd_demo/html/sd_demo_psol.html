@@ -1,0 +1,315 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>sd_demo_psol</title><meta name="generator" content="MATLAB 7.14"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2014-04-10"><meta name="DC.source" content="sd_demo_psol.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Continuation and stability of periodic orbits</a></li><li><a href="#2">Constructing an initial small-amplitude orbit near a Hopf bifurcation</a></li><li><a href="#3">Construction of an initial piece of the branch of periodic orbits</a></li><li><a href="#4">Figure: branch of periodic orbits</a></li><li><a href="#5">Stopping criterion</a></li><li><a href="#6">Figure: Periodic orbit with state-dependent delay equal to 0</a></li><li><a href="#7">A second family of periodic orbits - correction of initial orbit</a></li><li><a href="#8">Creation and continuation of branch</a></li><li><a href="#9">Figure: 2nd branch of periodic orbits</a></li><li><a href="#10">Figure: delay <img src="sd_demo_psol_eq92223.png" alt="$\tau_6=x_5$"> at last point of branch</a></li><li><a href="#11">Stability of periodic orbits</a></li><li><a href="#12">Figure: Floquet multipliers of last periodic orbit in <tt>branch4</tt></a></li><li><a href="#13">Save results, end of demo <tt>sd_demo</tt></a></li></ul></div><h2>Continuation and stability of periodic orbits<a name="1"></a></h2><p>DDE-biftool computes one-parameter families of periodic orbits (automatically determining their period) by solving periodic boundary-value problems approximately with collocation schemes. A typical starting point for a family of periodic orbits is a Hopf bifurcation. This demo requires <a href="sd_demo_hopf.html">sd_demo_hopf.html</a> to have run beforehand.</p><p>
+% (c) DDE-BIFTOOL v. 3.1.1(20), 11/04/2014
+</p><pre class="codeinput"><span class="comment">%#ok&lt;*ASGLU,*NOPTS,*NASGU&gt;</span>
+</pre><h2>Constructing an initial small-amplitude orbit near a Hopf bifurcation<a name="2"></a></h2><p>We use the first Hopf point in the <tt>branch2</tt> to construct a small amplitude (<tt>1e-1</tt>) periodic solution on an equidistant mesh of <tt>15</tt> intervals with piecewise polynomial degree <tt>3</tt>.</p><p>The steplength condition returned ensures the branch switch from the Hopf to the periodic solution as it avoids convergence of the amplitude to zero during corrections. Due to the presence of the steplength condition we also need to free one parameter, here <img src="sd_demo_psol_eq94222.png" alt="$\tau_1$"> (parameter <tt>10</tt>).</p><pre class="codeinput">hopf=branch2.point(1);
+intervals=15;
+degree=3;
+[psol,stepcond]=p_topsol(funcs,hopf,1e-1,degree,intervals);
+method=df_mthod(funcs,<span class="string">'psol'</span>);
+<span class="comment">% correct periodic solution guess:</span>
+[psol,success]=p_correc(funcs,psol,10,stepcond,method.point)
+</pre><pre class="codeoutput">psol = 
+         kind: 'psol'
+    parameter: [1x11 double]
+         mesh: [1x46 double]
+       degree: 3
+      profile: [5x46 double]
+       period: 11.4306
+success =
+     1
+</pre><h2>Construction of an initial piece of the branch of periodic orbits<a name="3"></a></h2><p>The result, along with a degenerate periodic solution with amplitude zero, is used to start on the emanating branch of periodic solutions, see figure below. We use adaptive mesh selection.  Note that in the case of sd-DDEs, <tt>min_bound</tt> for a constant delay being a continuation parameter should be defined in the same way as for other continuation parameters.</p><pre class="codeinput">branch3=df_brnch(funcs,10,<span class="string">'psol'</span>);        <span class="comment">% empty branch</span>
+branch3.parameter.min_bound(1,:)=[10 0];  <span class="comment">% lower and</span>
+branch3.parameter.max_bound(1,:)=[10 10]; <span class="comment">% upper bound of p10</span>
+branch3.parameter.max_step(1,:)=[10 0.01];
+deg_psol=p_topsol(funcs,hopf,0,degree,intervals);
+
+branch3.point=deg_psol; <span class="comment">% use deg_psol and psol as first two points on branch</span>
+branch3.point(2)=psol;
+
+figure(4); clf;
+[branch3,s,f,r]=br_contn(funcs,branch3,10); <span class="comment">% compute periodic solutions branch</span>
+<span class="comment">% indicate the last computed point on the branch</span>
+point=branch3.point(end);
+p_ampl=max(point.profile(1,:))-min(point.profile(1,:));
+plot(point.parameter(10),p_ampl,<span class="string">'o'</span>);
+xlabel(<span class="string">'p10'</span>);ylabel(<span class="string">'max(x1)-min(x1)'</span>);
+</pre><pre class="codeoutput">BR_CONTN warning: delay number_3 becomes negative.
+</pre><img vspace="5" hspace="5" src="sd_demo_psol_01.png" alt=""> <h2>Figure: branch of periodic orbits<a name="4"></a></h2><p>Branch of periodic solutions emanating from a Hopf bifurcation point. <tt>o</tt> - the last computed point in the branch (corresponding to <img src="sd_demo_psol_eq64236.png" alt="$\tau_3=0$"> at <tt>t=tz</tt>).</p><h2>Stopping criterion<a name="5"></a></h2><p>As in the case of computing <tt>branch1</tt>, we have a warning, <tt>BR_CONTN warning: delay number_3 becomes negative.</tt> indicating that the delay function <img src="sd_demo_psol_eq32189.png" alt="$\tau_3(t)$"> became negative at some point(s) on the period interval of the computed solution during continuation of the branch. The periodic solution with <img src="sd_demo_psol_eq32189.png" alt="$\tau_3(t)$"> negative is not accepted as the branch point. Instead, the following algorithm is executed. First, using the solution with <img src="sd_demo_psol_eq32189.png" alt="$\tau_3(t)$"> negative and a mesh refinement, a time point <tt>tz</tt> is computed at which <img src="sd_demo_psol_eq32189.png" alt="$\tau_3(t)$"> reaches its minimum. Then, a periodic solution is computed under the conditions, <img src="sd_demo_psol_eq31146.png" alt="$$ \tau_3(\mathtt{tz})=0,\qquad\mathrm{d}\tau_3(\mathtt{tz})/\mathrm{d}t=0. $$"> We compute and plot the delay <img src="sd_demo_psol_eq32189.png" alt="$\tau_3(t)$"> on the mesh of representation points at the last accepted point in the branch, see figure below.</p><pre class="codeinput">tau_eva=p_tau(funcs,branch3.point(end),3);
+figure(5); clf;
+plot(branch3.point(end).mesh,tau_eva);
+hold <span class="string">on</span>;
+plot(branch3.point(end).mesh,tau_eva,<span class="string">'.'</span>);
+xlabel(<span class="string">'t/period'</span>);ylabel(<span class="string">'x5'</span>);
+min(tau_eva)
+</pre><pre class="codeoutput">ans =
+   8.4445e-04
+</pre><img vspace="5" hspace="5" src="sd_demo_psol_02.png" alt=""> <h2>Figure: Periodic orbit with state-dependent delay equal to 0<a name="6"></a></h2><p><img src="sd_demo_psol_eq10764.png" alt="$\tau_3(t/T)$"> at the last computed point. Dots indicate representation points of the mesh used. The value of tau_eva shows that <img src="sd_demo_psol_eq32189.png" alt="$\tau_3(t)$">  has its minimal value at a point between two representation points.</p><h2>A second family of periodic orbits - correction of initial orbit<a name="7"></a></h2><p>Now we use the last Hopf point in the <tt>branch2</tt> to compute a branch of periodic solutions as a function of the parameter <img src="sd_demo_psol_eq28925.png" alt="$p_1$">, see figure below.</p><pre class="codeinput">hopf=branch2.point(end);
+intervals=15;
+degree=3;
+[psol,stepcond]=p_topsol(funcs,hopf,0.1,degree,intervals);
+method=df_mthod(funcs,<span class="string">'psol'</span>);
+<span class="comment">% correct periodic solution guess</span>
+[psol,success]=p_correc(funcs,psol,1,stepcond,method.point)
+</pre><pre class="codeoutput">psol = 
+         kind: 'psol'
+    parameter: [1x11 double]
+         mesh: [1x46 double]
+       degree: 3
+      profile: [5x46 double]
+       period: 12.6610
+success =
+     1
+</pre><h2>Creation and continuation of branch<a name="8"></a></h2><p>This branch is continued in parameter 1 following the standard procedure.</p><pre class="codeinput">branch4=df_brnch(funcs,1,<span class="string">'psol'</span>); <span class="comment">% empty branch</span>
+branch4.parameter.min_bound(1,:)=[1 0];    <span class="comment">% lower and</span>
+branch4.parameter.max_bound(1,:)=[1 10];   <span class="comment">% upper bound for p1</span>
+branch4.parameter.max_step(1,:)=[1 0.01];  <span class="comment">% max predictor step for p1</span>
+
+deg_psol=p_topsol(funcs,hopf,0,degree,intervals);
+branch4.point=deg_psol; <span class="comment">% use |deg_psol and</span>
+branch4.point(2)=psol;  <span class="comment">% psol as first two points on branch</span>
+
+figure(6); clf;
+[branch4,s,f,r]=br_contn(funcs,branch4,20); <span class="comment">% compute periodic solutions branch</span>
+<span class="comment">% indicate the last computed point on the branch</span>
+point=branch4.point(end);
+p_ampl=max(point.profile(1,:))-min(point.profile(1,:));
+plot(point.parameter(1),p_ampl,<span class="string">'o'</span>);
+xlabel(<span class="string">'p1'</span>);ylabel(<span class="string">'max(x1)-min(x1)'</span>);
+</pre><pre class="codeoutput">BR_CONTN warning: delay number_6 becomes negative.
+</pre><img vspace="5" hspace="5" src="sd_demo_psol_03.png" alt=""> <h2>Figure: 2nd branch of periodic orbits<a name="9"></a></h2><p>Branch of periodic solutions emanating from a Hopf point. <tt>o</tt> - the last computed point in the branch (corresponding to <img src="sd_demo_psol_eq94930.png" alt="$\tau_6=0$"> at <tt>tz</tt>).</p><p>We again have a warning, <tt>BR_CONTN warning: delay number_6 becomes negative</tt> We plot the delay <img src="sd_demo_psol_eq15535.png" alt="$\tau_6(t)$"> (recall that <img src="sd_demo_psol_eq31905.png" alt="$\tau_6(t)=x_5(t)$">) on the mesh of representation points at the last accepted point in the branch, see figure below.</p><pre class="codeinput">psol=branch4.point(end);
+<span class="comment">% plot delay 6 at representation points at the last point</span>
+figure(7); clf;
+plot(psol.mesh,psol.profile(5,:));
+hold;
+plot(psol.mesh,psol.profile(5,:),<span class="string">'.'</span>);
+min(psol.profile(5,:))
+xlabel(<span class="string">'t/period'</span>);ylabel(<span class="string">'x5'</span>);
+</pre><pre class="codeoutput">Current plot held
+ans =
+   2.7579e-05
+</pre><img vspace="5" hspace="5" src="sd_demo_psol_04.png" alt=""> <h2>Figure: delay <img src="sd_demo_psol_eq92223.png" alt="$\tau_6=x_5$"> at last point of branch<a name="10"></a></h2><p><img src="sd_demo_psol_eq61532.png" alt="$\tau_6(t/T)$"> at the last computed point. Dots indicate representation points of the mesh used.</p><p>The minimal value of the delay <img src="sd_demo_psol_eq94497.png" alt="$\tau_6$"> is a negative value. The stability of the corresponding solution is computed if this value is larger than the one defined in <tt>method.stability.delay_accuracy</tt>.</p><h2>Stability of periodic orbits<a name="11"></a></h2><p>The result of computing and plotting stability (Floquet multipliers) of this periodic solution is shown in the figure below. The solution is unstable.</p><pre class="codeinput">psol.stability=p_stabil(funcs,psol,method.stability);
+psol.stability.mu
+
+figure(8); clf;
+p_splot(psol);
+axis <span class="string">image</span>;
+xlabel(<span class="string">'\Re\mu'</span>); ylabel(<span class="string">'\Im\mu'</span>);
+</pre><pre class="codeoutput">ans =
+    1.3253
+    1.0000
+    0.0959
+</pre><img vspace="5" hspace="5" src="sd_demo_psol_05.png" alt=""> <h2>Figure: Floquet multipliers of last periodic orbit in <tt>branch4</tt><a name="12"></a></h2><h2>Save results, end of demo <tt>sd_demo</tt><a name="13"></a></h2><pre class="codeinput">save(<span class="string">'sd_demo_psol'</span>);
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.14<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Continuation and stability of periodic orbits
+% DDE-biftool computes one-parameter families of periodic orbits
+% (automatically determining their period) by solving periodic
+% boundary-value problems approximately with collocation schemes. A
+% typical starting point for a family of periodic orbits is a Hopf
+% bifurcation. This demo requires <sd_demo_hopf.html> to have run beforehand.
+%
+% <html>
+% $Id: sd_demo_psol.html 20 2014-04-11 19:27:33Z jan.sieber $
+% </html>
+%
+%#ok<*ASGLU,*NOPTS,*NASGU>
+%%
+%% Constructing an initial small-amplitude orbit near a Hopf bifurcation
+% We use the first Hopf point in the |branch2| to construct a small
+% amplitude (|1e-1|) periodic solution on an equidistant mesh of |15|
+% intervals with piecewise polynomial degree |3|.
+%
+% The steplength condition returned ensures the branch switch from the Hopf
+% to the periodic solution as it avoids convergence of the amplitude to
+% zero during corrections. Due to the presence of the steplength condition
+% we also need to free one parameter, here $\tau_1$ (parameter |10|).
+hopf=branch2.point(1);
+intervals=15;
+degree=3;
+[psol,stepcond]=p_topsol(funcs,hopf,1e-1,degree,intervals);
+method=df_mthod(funcs,'psol');
+% correct periodic solution guess:
+[psol,success]=p_correc(funcs,psol,10,stepcond,method.point) 
+
+%% Construction of an initial piece of the branch of periodic orbits
+% The result, along with a degenerate periodic solution with amplitude
+% zero, is used to start on the emanating branch of periodic solutions, see
+% figure below. We use adaptive mesh selection.  Note that in the case of
+% sd-DDEs, |min_bound| for a constant delay being a continuation parameter
+% should be defined in the same way as for other continuation parameters.
+branch3=df_brnch(funcs,10,'psol');        % empty branch
+branch3.parameter.min_bound(1,:)=[10 0];  % lower and 
+branch3.parameter.max_bound(1,:)=[10 10]; % upper bound of p10
+branch3.parameter.max_step(1,:)=[10 0.01];
+deg_psol=p_topsol(funcs,hopf,0,degree,intervals);
+
+branch3.point=deg_psol; % use deg_psol and psol as first two points on branch
+branch3.point(2)=psol;
+
+figure(4); clf;
+[branch3,s,f,r]=br_contn(funcs,branch3,10); % compute periodic solutions branch
+% indicate the last computed point on the branch
+point=branch3.point(end);
+p_ampl=max(point.profile(1,:))-min(point.profile(1,:));
+plot(point.parameter(10),p_ampl,'o');
+xlabel('p10');ylabel('max(x1)-min(x1)');
+%% Figure: branch of periodic orbits
+% Branch of periodic solutions emanating from a Hopf bifurcation point. |o|
+% - the last computed point in the branch (corresponding to $\tau_3=0$ at
+% |t=tz|).
+
+%% Stopping criterion
+% As in the case of computing |branch1|, we have a warning, |BR_CONTN
+% warning: delay number_3 becomes negative.| indicating that the delay
+% function $\tau_3(t)$ became negative at some point(s) on the period
+% interval of the computed solution during continuation of the branch. The
+% periodic solution with $\tau_3(t)$ negative is not accepted as the branch
+% point. Instead, the following algorithm is executed. First, using the
+% solution with $\tau_3(t)$ negative and a mesh refinement, a time point
+% |tz| is computed at which $\tau_3(t)$ reaches its minimum. Then, a
+% periodic solution is computed under the conditions,
+% $$
+% \tau_3(\mathtt{tz})=0,\qquad\mathrm{d}\tau_3(\mathtt{tz})/\mathrm{d}t=0.
+% $$
+% We compute and plot the delay $\tau_3(t)$ on the mesh of representation
+% points at the last accepted point in the branch, see figure below.
+tau_eva=p_tau(funcs,branch3.point(end),3);
+figure(5); clf;
+plot(branch3.point(end).mesh,tau_eva);
+hold on;
+plot(branch3.point(end).mesh,tau_eva,'.');
+xlabel('t/period');ylabel('x5');
+min(tau_eva) 
+%% Figure: Periodic orbit with state-dependent delay equal to 0
+% $\tau_3(t/T)$ at the last computed point. Dots indicate representation
+% points of the mesh used. The value of tau_eva shows that $\tau_3(t)$  has
+% its minimal value at a point between two representation points.
+
+%% A second family of periodic orbits - correction of initial orbit
+% Now we use the last Hopf point in the |branch2| to compute a
+% branch of periodic solutions as a function of the parameter $p_1$, see
+% figure below.
+hopf=branch2.point(end);
+intervals=15;
+degree=3;
+[psol,stepcond]=p_topsol(funcs,hopf,0.1,degree,intervals);
+method=df_mthod(funcs,'psol');
+% correct periodic solution guess
+[psol,success]=p_correc(funcs,psol,1,stepcond,method.point)
+%% Creation and continuation of branch
+% This branch is continued in parameter 1 following the standard procedure.
+branch4=df_brnch(funcs,1,'psol'); % empty branch
+branch4.parameter.min_bound(1,:)=[1 0];    % lower and
+branch4.parameter.max_bound(1,:)=[1 10];   % upper bound for p1
+branch4.parameter.max_step(1,:)=[1 0.01];  % max predictor step for p1
+
+deg_psol=p_topsol(funcs,hopf,0,degree,intervals);
+branch4.point=deg_psol; % use |deg_psol and
+branch4.point(2)=psol;  % psol as first two points on branch
+
+figure(6); clf;
+[branch4,s,f,r]=br_contn(funcs,branch4,20); % compute periodic solutions branch
+% indicate the last computed point on the branch
+point=branch4.point(end);
+p_ampl=max(point.profile(1,:))-min(point.profile(1,:));
+plot(point.parameter(1),p_ampl,'o');
+xlabel('p1');ylabel('max(x1)-min(x1)');
+%% Figure: 2nd branch of periodic orbits
+% Branch of periodic solutions emanating from a Hopf point. |o| - the last
+% computed point in the branch (corresponding to $\tau_6=0$ at |tz|).
+%
+% We again have a warning, |BR_CONTN warning: delay number_6 becomes
+% negative| We plot the delay $\tau_6(t)$ (recall that $\tau_6(t)=x_5(t)$)
+% on the mesh of representation points at the last accepted point 
+% in the branch, see figure below.
+
+psol=branch4.point(end); 
+% plot delay 6 at representation points at the last point
+figure(7); clf;
+plot(psol.mesh,psol.profile(5,:));
+hold;
+plot(psol.mesh,psol.profile(5,:),'.');
+min(psol.profile(5,:))
+xlabel('t/period');ylabel('x5');
+%% Figure: delay $\tau_6=x_5$ at last point of branch
+% $\tau_6(t/T)$ at the last computed point. Dots indicate representation
+% points of the mesh used.
+%
+% The minimal value of the delay $\tau_6$ is a negative value. 
+% The stability of the corresponding solution is computed if this value is
+% larger than the one defined in |method.stability.delay_accuracy|.
+
+%% Stability of periodic orbits
+% The result of computing and plotting stability (Floquet multipliers) of
+% this periodic solution is shown in the figure below. The solution
+% is unstable.
+psol.stability=p_stabil(funcs,psol,method.stability);
+psol.stability.mu
+
+figure(8); clf;
+p_splot(psol);
+axis image;
+xlabel('\Re\mu'); ylabel('\Im\mu');
+%% Figure: Floquet multipliers of last periodic orbit in |branch4|
+%% Save results, end of demo |sd_demo|
+save('sd_demo_psol');
+##### SOURCE END #####
+--></body></html>

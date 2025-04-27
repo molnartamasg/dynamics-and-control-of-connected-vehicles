@@ -1,0 +1,138 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>sd_demo_hopf</title><meta name="generator" content="MATLAB 7.14"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2014-04-10"><meta name="DC.source" content="sd_demo_hopf.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Detection and continuation of Hopf bifurcations</a></li><li><a href="#2">Detection and correction of Hopf point on branch of equilibria</a></li><li><a href="#3">Creation of initial piece of Hopf bifurcation branch</a></li><li><a href="#4">Figure: Hopf bifurcation in two parameters</a></li><li><a href="#5">Save and move on to continuation and stability of periodic orbits</a></li></ul></div><h2>Detection and continuation of Hopf bifurcations<a name="1"></a></h2><p>The eigenvalues of the linearized system along branches of equilibria indicate potential bifurcations. In this demo complex conjugate pairs of eigenvalues cross the imaginary axis, corresponding to Hopf bifurcations. The demo will proceed to continue two of these Hopf bifurcations in two system parameters <img src="sd_demo_hopf_eq40866.png" alt="$p_2$"> and <img src="sd_demo_hopf_eq68766.png" alt="$p_9$">. This part requires to run <a href="sd_demo_stst.html">sd_demo_stst.html</a> first</p><p>
+% (c) DDE-BIFTOOL v. 3.1.1(20), 11/04/2014
+</p><pre class="codeinput"><span class="comment">%#ok&lt;*ASGLU,*NOPTS,*NASGU&gt;</span>
+</pre><h2>Detection and correction of Hopf point on branch of equilibria<a name="2"></a></h2><p>We select point 5 and turn it into an (approximate) Hopf bifurcation point. Then we correct the Hopf-like point using appropriate method parameters and one free parameter (<img src="sd_demo_hopf_eq36293.png" alt="$p_5$">).</p><pre class="codeinput">hopf=p_tohopf(funcs,branch1.point(5)); <span class="comment">% select a point and turn into hopf guess</span>
+method=df_mthod(funcs,<span class="string">'hopf'</span>); <span class="comment">% get hopf calculation method parameters</span>
+[hopf,success]=p_correc(funcs,hopf,5,[],method.point) <span class="comment">% correct Hopf</span>
+</pre><pre class="codeoutput">hopf = 
+         kind: 'hopf'
+    parameter: [1x11 double]
+            x: [5x1 double]
+            v: [5x1 double]
+        omega: 0.5497
+success =
+     1
+</pre><h2>Creation of initial piece of Hopf bifurcation branch<a name="3"></a></h2><p>In order to follow a branch of Hopf bifurcations in the two parameter space <img src="sd_demo_hopf_eq43417.png" alt="$(p_2,p_9)$"> we again need two starting points. We use the Hopf point already found and one perturbed in <img src="sd_demo_hopf_eq68766.png" alt="$p_9$"> and corrected in <img src="sd_demo_hopf_eq40866.png" alt="$p_2$">, to start on a branch of Hopf bifurcations. Finally, we continue the branch, see figure below.</p><pre class="codeinput">branch2=df_brnch(funcs,[2 9],<span class="string">'hopf'</span>);
+branch2.parameter.min_bound(1:2,:)=[[2 -1]' [9 -1]']'; <span class="comment">% lower and</span>
+branch2.parameter.max_bound(1:2,:)=[[2 10]' [9 10]']'; <span class="comment">% upper bound for p2</span>
+branch2.parameter.max_step(1:2,:)=[[2 1]' [9 1]']';    <span class="comment">% max step for perdictor in p2</span>
+branch2.point=hopf;                                    <span class="comment">% first point on branch</span>
+
+hopf.parameter(9)=hopf.parameter(9)+0.1;               <span class="comment">% perturb Hopf point</span>
+[hopf,success]=p_correc(funcs,hopf,2,[],method.point); <span class="comment">% correct 2nd Hopf point</span>
+branch2.point(2)=hopf;                                 <span class="comment">% and use as 2nd point of Hopf branch</span>
+
+figure(3); clf;
+[branch2,s,f,r]=br_contn(funcs,branch2,14); <span class="comment">% continue with plotting Hopf branch</span>
+xlabel(<span class="string">'p2'</span>);ylabel(<span class="string">'p9'</span>);
+</pre><img vspace="5" hspace="5" src="sd_demo_hopf_01.png" alt=""> <h2>Figure: Hopf bifurcation in two parameters<a name="4"></a></h2><p>Predictions and corrections in the <img src="sd_demo_hopf_eq43417.png" alt="$(p_2,p_9)$">-plane after computation of a branch of Hopf bifurcations.</p><h2>Save and move on to continuation and stability of periodic orbits<a name="5"></a></h2><p>save results and continue with periodic orbits in <a href="sd_demo_psol.html">sd_demo_psol.html</a></p><pre class="codeinput">save(<span class="string">'sd_demo_hopf'</span>);
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.14<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Detection and continuation of Hopf bifurcations
+% The eigenvalues of the linearized system along branches of equilibria
+% indicate potential bifurcations. In this demo complex conjugate pairs of
+% eigenvalues cross the imaginary axis, corresponding to Hopf bifurcations.
+% The demo will proceed to continue two of these Hopf bifurcations in two
+% system parameters $p_2$ and $p_9$. This part requires to run
+% <sd_demo_stst.html> first
+%
+% <html>
+% $Id: sd_demo_hopf.html 20 2014-04-11 19:27:33Z jan.sieber $
+% </html>
+%
+%#ok<*ASGLU,*NOPTS,*NASGU>
+%%
+%% Detection and correction of Hopf point on branch of equilibria
+% We select point 5 and turn it into an (approximate) Hopf bifurcation
+% point. Then we correct the Hopf-like point using appropriate method
+% parameters and one free parameter ($p_5$).
+hopf=p_tohopf(funcs,branch1.point(5)); % select a point and turn into hopf guess
+method=df_mthod(funcs,'hopf'); % get hopf calculation method parameters
+[hopf,success]=p_correc(funcs,hopf,5,[],method.point) % correct Hopf
+
+%% Creation of initial piece of Hopf bifurcation branch
+% In order to follow a branch of Hopf bifurcations in the two parameter
+% space $(p_2,p_9)$ we again need two starting points. We use the Hopf
+% point already found and one perturbed in $p_9$ and corrected in $p_2$, to
+% start on a branch of Hopf bifurcations. Finally, we continue the branch,
+% see figure below.
+
+branch2=df_brnch(funcs,[2 9],'hopf');
+branch2.parameter.min_bound(1:2,:)=[[2 -1]' [9 -1]']'; % lower and
+branch2.parameter.max_bound(1:2,:)=[[2 10]' [9 10]']'; % upper bound for p2
+branch2.parameter.max_step(1:2,:)=[[2 1]' [9 1]']';    % max step for perdictor in p2
+branch2.point=hopf;                                    % first point on branch
+
+hopf.parameter(9)=hopf.parameter(9)+0.1;               % perturb Hopf point
+[hopf,success]=p_correc(funcs,hopf,2,[],method.point); % correct 2nd Hopf point
+branch2.point(2)=hopf;                                 % and use as 2nd point of Hopf branch
+
+figure(3); clf;
+[branch2,s,f,r]=br_contn(funcs,branch2,14); % continue with plotting Hopf branch
+xlabel('p2');ylabel('p9');
+%% Figure: Hopf bifurcation in two parameters
+% Predictions and corrections in the $(p_2,p_9)$-plane after computation of
+% a branch of Hopf bifurcations.
+%% Save and move on to continuation and stability of periodic orbits
+% save results and continue with periodic orbits in <sd_demo_psol.html>
+save('sd_demo_hopf');
+##### SOURCE END #####
+--></body></html>
