@@ -1,0 +1,638 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Demo of extension for rotational symmetry using Lang-Kobayashi equations</title><meta name="generator" content="MATLAB 7.14"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2014-04-03"><meta name="DC.source" content="rotsym_demo.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+
+  </style></head><body><div class="content"><h1>Demo of extension for rotational symmetry using Lang-Kobayashi equations</h1><!--introduction--><p>The equation (modelling a laser subject to delayed coherent optical feedback) is given as</p><p><img src="rotsym_demo_eq64307.png" alt="$$E'(t)=[1+i\alpha]n(t)E(t)+\eta\exp(i\phi)E(t-\tau), \qquad&#xA;  n'(t)=\epsilon[p-n(t)-(2n(t)+1)\bar E(t)E(t)]$$"></p><p>The main bifurcation parameters will be <img src="rotsym_demo_eq08165.png" alt="$\eta$"> and <img src="rotsym_demo_eq26509.png" alt="$\phi$">.</p><p><b>Warning</b> The functions for the extended systems determining relative equilibria (rotating waves) and relative periodic orbits (modulated waves), do not have support for user-provided system derivatves or state-dependent delays!</p><p>
+% (c) DDE-BIFTOOL v. 3.1.1(20), 11/04/2014
+</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Load DDE-Biftool and extension into Path</a></li><li><a href="#2">Problem definition using <tt>set_rotfuncs</tt></a></li><li><a href="#3">Initial values of parameters and parameter indices</a></li><li><a href="#4">Right-hand side and call to <tt>set_rotfuncs</tt></a></li><li><a href="#5">Extended functions in rotating coordinates for rotating waves</a></li><li><a href="#6">Initial guess</a></li><li><a href="#7">Relative equilibria varying phase <tt>phi</tt> of the delayed feedback</a></li><li><a href="#8">Linear Stability of relative equilibria</a></li><li><a href="#9">Modulated waves (Relative periodic orbits, RPOs)</a></li><li><a href="#10">RPOs branching off at 2nd Hopf of REs</a></li><li><a href="#11">Stability of RPOs</a></li><li><a href="#12">Plot of "phase portraits" of relative periodic orbits</a></li><li><a href="#13">Continuation of fold of relative equilibria</a></li><li><a href="#14">Continuation of 2nd fold of relative equilibria</a></li><li><a href="#15">Continuation of Hopf bifurcations of relative equilibria</a></li><li><a href="#16">Plot all bifurcations of relative equilibria</a></li><li><a href="#17">Period doubling of relative POs</a></li><li><a href="#19">Stability of orbits at the period doubling</a></li><li><a href="#20">Fold of relative POs</a></li><li><a href="#22">Stability of orbits at fold of RPOs</a></li><li><a href="#24">re-plot all bifurcations</a></li></ul></div><h2>Load DDE-Biftool and extension into Path<a name="1"></a></h2><pre class="codeinput">clear
+addpath(<span class="string">'../../ddebiftool/'</span>,<span class="keyword">...</span>
+    <span class="string">'../../ddebiftool_extra_psol/'</span>,<span class="keyword">...</span>
+    <span class="string">'../../ddebiftool_utilities/'</span>,<span class="keyword">...</span>
+    <span class="string">'../../ddebiftool_extra_rotsym'</span>);
+</pre><h2>Problem definition using <tt>set_rotfuncs</tt><a name="2"></a></h2><p>In addition to the user-defined functions <tt>set_rotfuncs</tt> needs the matrix <tt>A</tt> generating the rotation and (optional) the rotation as a function <img src="rotsym_demo_eq88037.png" alt="$\phi\mapsto \exp(A\phi)$">. Then the system is assumed to have rotational symmetry <img src="rotsym_demo_eq29828.png" alt="$exp(A\phi)$"> where <tt>A</tt> is anti-symmetric.</p><pre class="codeinput">A=[0,-1,0; 1,0,0; 0,0,0];
+expA=@(phi) [cos(phi), -sin(phi),0; sin(phi), cos(phi),0; 0,0,1];
+</pre><h2>Initial values of parameters and parameter indices<a name="3"></a></h2><pre class="codeinput">alpha=4;      <span class="comment">% alpha factor</span>
+pump=0.1;    <span class="comment">% injection current</span>
+epsilon=5e-3; <span class="comment">% carrier relaxation time</span>
+eta=5e-3;      <span class="comment">% feedback strength</span>
+phi0=0;      <span class="comment">% feedback phase</span>
+tau0=100;      <span class="comment">% initial delay</span>
+par=[pump,eta,phi0,tau0,alpha,epsilon];
+<span class="comment">% indices</span>
+ndim=3;
+ind_pump=1;
+ind_eta=2;
+ind_phi=3;
+ind_tau=4;
+ind_omega=length(par)+1;
+</pre><h2>Right-hand side and call to <tt>set_rotfuncs</tt><a name="4"></a></h2><pre class="codeinput">f=@(x,p)LangKobayashi(x(1,1,:)+1i*x(2,1,:),x(1,2,:)+1i*x(2,2,:),x(3,1,:),<span class="keyword">...</span>
+    p(5),p(ind_pump),p(ind_eta),p(ind_phi),p(6));
+rfuncs=set_rotfuncs(<span class="string">'sys_rhs'</span>,f,<span class="string">'rotation'</span>,A,<span class="string">'exp_rotation'</span>,expA,<span class="keyword">...</span>
+    <span class="string">'sys_tau'</span>,@()ind_tau,<span class="string">'x_vectorized'</span>,true);
+</pre><h2>Extended functions in rotating coordinates for rotating waves<a name="5"></a></h2><p>A rotating wave (relative equilibrium, RE) is a solution of the form</p><p><img src="rotsym_demo_eq76910.png" alt="$$ x(t)=\exp(A\omega t)x_0. $$"></p><p>The extended functions in <tt>rfuncs</tt> will always treat the user-provided system in rotating coordinates.</p><p>Original system (by user):</p><p><img src="rotsym_demo_eq83559.png" alt="$$x'(t)=f(x(t),x(t-\tau_1),...,x(t-\tau_n))$$"></p><p>Rotating coordinates: <img src="rotsym_demo_eq58146.png" alt="$x(t)=\exp(A\omega t)y(t)$">:</p><p><img src="rotsym_demo_eq16040.png" alt="$$y'(t)=-A \omega y(t)+f(y(t),\exp(-A\omega\tau_1)y(t-\tau_1),\ldots,&#xA;   \exp(-A\omega\tau_n)y(t-\tau_n))$$"></p><p>The rotation speed is chosen such that the rotating wave <img src="rotsym_demo_eq00430.png" alt="$x(t)=\exp(A\omega t)x_0$"> is turned into an equilibrium <img src="rotsym_demo_eq84551.png" alt="$y(t)=y_0$">. This is achieved by solving for equilibria of the <img src="rotsym_demo_eq44020.png" alt="$y$"> equation and adding a <tt>sys_cond</tt> (file <tt>rot_cond.m</tt>) to povide an equation determining <img src="rotsym_demo_eq84050.png" alt="$\omega$">. For rotating waves this is</p><p><img src="rotsym_demo_eq95941.png" alt="$$ y_\mathrm{ref}^TAy=0 $$"></p><p>As DDE-Biftool does not give the user's <tt>sys_cond</tt> access to reference points, <tt>rot_cond</tt> returns residual 0 and Jacobian <img src="rotsym_demo_eq41950.png" alt="$y_0^TA$">.</p><h2>Initial guess<a name="6"></a></h2><p>The extension for rotating and modulated waves is <b>not</b> able to cope with invariant equilibria. Thus, we generate a non-trivial rotating wave as our initial guess. For the laser the rotating waves correspond to stationary lasing (on state) <img src="rotsym_demo_eq35218.png" alt="$E(t)=E_0\exp(i\omega t)$">, <img src="rotsym_demo_eq55132.png" alt="$n=n_0$">.</p><pre class="codeinput">[E0,n0,phi0,omega0]=LK_init(alpha,pump,eta,tau0);
+par(ind_phi)=phi0;
+par(ind_omega)=omega0;
+opt_inputs={<span class="string">'extra_condition'</span>,1,<span class="string">'print_residual_info'</span>,0};
+</pre><h2>Relative equilibria varying phase <tt>phi</tt> of the delayed feedback<a name="7"></a></h2><p>The standard convenience function <tt>SetupStst</tt> works, but one must add the continuation parameter index <tt>length(parameter)</tt> to the index list of continuation parameters.</p><p><b>Warning</b> DDE-Biftool assumes that the rotation speed is the last parameter in the parameter vector!</p><pre class="codeinput">rw_phas=SetupStst(rfuncs,<span class="string">'contpar'</span>,[ind_phi,ind_omega],<span class="string">'corpar'</span>,ind_omega,<span class="keyword">...</span>
+    <span class="string">'x'</span>,[E0;n0],<span class="string">'parameter'</span>,par,opt_inputs{:},<span class="keyword">...</span>
+    <span class="string">'max_step'</span>,[ind_phi,0.2]);
+figure(2);clf
+rw_phas=br_contn(rfuncs,rw_phas,200);
+</pre><img vspace="5" hspace="5" src="rotsym_demo_01.png" alt=""> <h2>Linear Stability of relative equilibria<a name="8"></a></h2><p>The standard convenience function <tt>GetStability</tt> works. However, all relative equilibria have a trivial eigenvalue 0, corresponding to phase shift. If <img src="rotsym_demo_eq69357.png" alt="$x_0$"> is a relative equilibrium (with rotation speed <img src="rotsym_demo_eq84050.png" alt="$\omega$">) then <img src="rotsym_demo_eq14031.png" alt="$\exp(A\rho)x_0$"> is also a relative equilibrium with the same rotation speed <img src="rotsym_demo_eq84050.png" alt="$\omega$">. One can adapt <tt>GetStability</tt> by setting the optional flag <tt>exclude_trivial</tt> to <tt>true</tt> and providing a function for locating the trivial eigenvalue: <tt>'locate_trivial',@(p)0</tt>.</p><pre class="codeinput">[rw_phas_nunst,dom,defect,rw_phas.point]=GetStability(rw_phas,<span class="keyword">...</span>
+    <span class="string">'exclude_trivial'</span>,true,<span class="string">'locate_trivial'</span>,@(p)0,<span class="string">'funcs'</span>,rfuncs);
+<span class="comment">% plot with stability information</span>
+p2=arrayfun(@(p)p.parameter(ind_phi),rw_phas.point);
+A2=arrayfun(@(p)norm(p.x(1:2)),rw_phas.point);
+n2=arrayfun(@(p)norm(p.x(3)),rw_phas.point);
+om2=arrayfun(@(p)p.parameter(ind_omega),rw_phas.point);
+figure(1);clf
+tdeco={<span class="string">'fontsize'</span>,14,<span class="string">'fontweight'</span>,<span class="string">'bold'</span>};
+sel=@(x,i)x(rw_phas_nunst==i);
+plot(sel(p2,0),sel(A2,0),<span class="string">'k.'</span>,sel(p2,1),sel(A2,1),<span class="string">'r.'</span>,<span class="keyword">...</span>
+    sel(p2,2),sel(A2,2),<span class="string">'c.'</span>,sel(p2,3),sel(A2,3),<span class="string">'b.'</span>,<span class="string">'linewidth'</span>,2);
+<span class="comment">% detect Hopf bifurcations</span>
+ind_hopf=find(abs(diff(rw_phas_nunst))==2);
+hold <span class="string">on</span>
+plot(p2(ind_hopf),A2(ind_hopf),<span class="string">'ks'</span>,<span class="string">'linewidth'</span>,2);
+hold <span class="string">off</span>
+set(gca,tdeco{:});
+xlabel(<span class="string">'phi'</span>,tdeco{:});
+ylabel(<span class="string">'|E|'</span>,tdeco{:});
+</pre><img vspace="5" hspace="5" src="rotsym_demo_02.png" alt=""> <h2>Modulated waves (Relative periodic orbits, RPOs)<a name="9"></a></h2><p>Modulated waves are solutions of the form</p><p><img src="rotsym_demo_eq72348.png" alt="$$ x(t)=\exp(A\omega t)x_0(t)$$"></p><p>where <img src="rotsym_demo_eq78318.png" alt="$x0(t)=x0(t-T)$"> for all <img src="rotsym_demo_eq07064.png" alt="$t$"> and some period <img src="rotsym_demo_eq57315.png" alt="$T$">. That is, <img src="rotsym_demo_eq43635.png" alt="$x(t)$"> is quasi-periodic, but can be turned into a periodic solution in rotating coordinates. The transformation to rotating coordinates is the same as for relative equilibria, but the additional condition (<tt>rot_cond</tt>) is</p><p><img src="rotsym_demo_eq43395.png" alt="$$\int_0^1 y_\mathrm{ref}^TAy(t) \mathrm{d} t=0$$"></p><p>where <img src="rotsym_demo_eq17979.png" alt="$y_\mathrm{ref}(t)$"> is a reference solution. Since DDE-Biftool does not give access to reference solutions in user-defined conditions, <tt>rot_cond</tt> returns residual 0 and Jacobian <img src="rotsym_demo_eq35126.png" alt="$y(t)^TA$">.</p><h2>RPOs branching off at 2nd Hopf of REs<a name="10"></a></h2><p>The initialization works with the standard routine. Again, the rotation speed needs to be added to the list of continuation parameters.</p><pre class="codeinput">[rw_phas_per,suc]=SetupPsol(rfuncs,rw_phas,ind_hopf(2),opt_inputs{:},<span class="keyword">...</span>
+    <span class="string">'max_step'</span>,[ind_phi,0.1],<span class="string">'print_residual_info'</span>,1,<span class="string">'radius'</span>,0.02);
+<span class="keyword">if</span> ~suc
+    error(<span class="string">'Hopf initialization failed'</span>);
+<span class="keyword">end</span>
+figure(2);clf
+rw_phas_per=br_contn(rfuncs,rw_phas_per,120);
+</pre><pre class="codeoutput">it=1, res=0.000477416
+it=2, res=3.6662e-06
+it=3, res=5.22068e-10
+it=1, res=0.0221118
+it=2, res=1.03329e-05
+it=3, res=1.89367e-10
+it=1, res=5.30159e-05
+it=2, res=8.06852e-12
+it=1, res=0.0588672
+it=2, res=0.00783925
+it=3, res=0.000225981
+it=4, res=1.17327e-07
+it=5, res=1.68753e-11
+it=1, res=0.0150051
+it=2, res=0.000562676
+it=3, res=8.21825e-07
+it=4, res=3.38499e-11
+it=1, res=6.52136e-05
+it=2, res=5.3547e-11
+it=1, res=0.0114482
+...</pre><img vspace="5" hspace="5" src="rotsym_demo_03.png" alt=""> <h2>Stability of RPOs<a name="11"></a></h2><p>Similar to REs, the RPOs have an additional trivial Floquet multiplier 1. That is, overall, RPOs have always a double Floquet multiplier 1. To exclude the two Floquet mulitpliers closest to unity from the stability, set the optional flag <tt>'exclude_trivial'</tt> to <tt>true</tt> and provide for the optional argument <tt>'locate_trivial'</tt> the function <tt>@(p)[1,1]</tt>.</p><pre class="codeinput">[rw_phas_per_nunst,dom_per,defect,rw_phas_per.point]=GetStability(rw_phas_per,<span class="keyword">...</span>
+    <span class="string">'exclude_trivial'</span>,true,<span class="string">'locate_trivial'</span>,@(p)[1,1],<span class="string">'funcs'</span>,rfuncs);
+<span class="comment">% plot with stability info</span>
+pp=arrayfun(@(p)p.parameter(ind_phi),rw_phas_per.point);
+Epow=@(x)sqrt(sum(x(1:2,:).^2,1));
+Apmx=arrayfun(@(p)max(Epow(p.profile)),rw_phas_per.point);
+Apmn=arrayfun(@(p)min(Epow(p.profile)),rw_phas_per.point);
+figure(1);hold <span class="string">on</span>
+sel=@(x,i)x(rw_phas_per_nunst==i);
+plot(sel(pp,0),[sel(Apmx,0);sel(Apmn,0)],<span class="string">'ko'</span>,<span class="keyword">...</span>
+    sel(pp,1),[sel(Apmx,1);sel(Apmn,1)],<span class="string">'ro'</span>);
+axis <span class="string">tight</span>
+</pre><img vspace="5" hspace="5" src="rotsym_demo_04.png" alt=""> <h2>Plot of "phase portraits" of relative periodic orbits<a name="12"></a></h2><pre class="codeinput">figure(2);clf;hold <span class="string">on</span>
+<span class="keyword">for</span> i=1:length(rw_phas_per.point)
+    plot(Epow(rw_phas_per.point(i).profile),rw_phas_per.point(i).profile(3,:),<span class="string">'.-'</span>);
+<span class="keyword">end</span>
+hold <span class="string">off</span>
+grid <span class="string">on</span>
+axis <span class="string">tight</span>
+set(gca,tdeco{:});
+xlabel(<span class="string">'n'</span>,tdeco{:});
+ylabel(<span class="string">'|E|'</span>,tdeco{:});
+</pre><img vspace="5" hspace="5" src="rotsym_demo_05.png" alt=""> <h2>Continuation of fold of relative equilibria<a name="13"></a></h2><p>The functions for the extended system are generated by <tt>SetupRWFold</tt>. The standard routine <tt>SetupPOfold</tt> has to be modified because the extended condition <tt>rot_cond</tt> has to be applied to the derivative, too. Also the rotation speed needs to be added to the list of continuation parameters. The extended system for fold continuation of REs has one additional artificial continuation parameter.</p><pre class="codeinput">ind_fold=find(abs(diff(rw_phas_nunst))==1);
+[foldfuncs,fold1branch,suc]=SetupRWFold(rfuncs,rw_phas,ind_fold(1),<span class="keyword">...</span>
+    <span class="string">'contpar'</span>,[ind_phi,ind_eta,ind_omega],opt_inputs{:},<span class="keyword">...</span>
+    <span class="string">'print_residual_info'</span>,1,<span class="string">'dir'</span>,ind_eta,<span class="string">'step'</span>,1e-4,<span class="keyword">...</span>
+    <span class="string">'max_step'</span>,[ind_phi,0.1; ind_eta,0.01]);
+<span class="comment">%</span>
+figure(2);clf
+fold1branch=br_contn(foldfuncs,fold1branch,40);
+fold1branch=br_rvers(fold1branch);
+fold1branch=br_contn(foldfuncs,fold1branch,40);
+</pre><pre class="codeoutput">it=1, res=0.000227057
+it=2, res=1.89309e-07
+it=3, res=7.55566e-13
+it=1, res=0.00295185
+it=2, res=3.1161e-05
+it=3, res=1.17747e-09
+it=4, res=1.48714e-13
+it=1, res=0.000121684
+it=2, res=4.67372e-08
+it=3, res=1.17521e-12
+it=1, res=0.000167978
+it=2, res=7.92878e-08
+it=3, res=2.02029e-12
+it=1, res=0.000230893
+it=2, res=1.32172e-07
+it=3, res=3.39468e-12
+it=1, res=0.000316131
+it=2, res=2.15835e-07
+it=3, res=5.57805e-12
+it=1, res=0.00043142
+...</pre><img vspace="5" hspace="5" src="rotsym_demo_06.png" alt=""> <h2>Continuation of 2nd fold of relative equilibria<a name="14"></a></h2><pre class="codeinput">[foldfuncs,fold2branch,suc]=SetupRWFold(rfuncs,rw_phas,ind_fold(2),<span class="keyword">...</span>
+    <span class="string">'contpar'</span>,[ind_phi,ind_eta,ind_omega],opt_inputs{:},<span class="keyword">...</span>
+    <span class="string">'print_residual_info'</span>,1,<span class="string">'dir'</span>,ind_eta,<span class="string">'step'</span>,1e-4,<span class="keyword">...</span>
+    <span class="string">'max_step'</span>,[ind_phi,0.1; ind_eta,0.01]);
+fold2branch=br_contn(foldfuncs,fold2branch,40);
+fold2branch=br_rvers(fold2branch);
+fold2branch=br_contn(foldfuncs,fold2branch,40);
+</pre><pre class="codeoutput">it=1, res=0.0015423
+it=2, res=6.08298e-06
+it=3, res=8.11908e-11
+it=1, res=0.00260918
+it=2, res=1.77492e-05
+it=3, res=1.04899e-09
+it=4, res=1.27337e-13
+it=1, res=8.39014e-05
+it=2, res=3.18751e-08
+it=3, res=7.03865e-13
+it=1, res=0.000113958
+it=2, res=5.685e-08
+it=3, res=1.16332e-12
+it=1, res=0.000153584
+it=2, res=9.80475e-08
+it=3, res=1.85983e-12
+it=1, res=0.000205308
+it=2, res=1.63672e-07
+it=3, res=2.86437e-12
+it=1, res=0.000272155
+...</pre><img vspace="5" hspace="5" src="rotsym_demo_07.png" alt=""> <h2>Continuation of Hopf bifurcations of relative equilibria<a name="15"></a></h2><p>For Hopf bifurcation continuation the standard routine <tt>SetupHopf</tt> works without modification (<tt>SetupRWHopf</tt> is a simple wrapper).</p><pre class="codeinput">[h1branch,suc]=SetupRWHopf(rfuncs,rw_phas,ind_hopf(1),<span class="keyword">...</span>
+    <span class="string">'contpar'</span>,[ind_phi,ind_eta,ind_omega],opt_inputs{:},<span class="keyword">...</span>
+    <span class="string">'print_residual_info'</span>,1,<span class="string">'dir'</span>,ind_eta,<span class="string">'step'</span>,1e-4,<span class="string">'minimal_accuracy'</span>,1e-4);
+h1branch=br_contn(rfuncs,h1branch,50);
+h1branch=br_rvers(h1branch);
+h1branch=br_contn(rfuncs,h1branch,50);
+</pre><pre class="codeoutput">it=1, res=0.000130178
+it=2, res=3.07845e-07
+it=3, res=1.14108e-11
+it=1, res=0.000104569
+it=2, res=2.39606e-07
+it=3, res=4.63018e-12
+it=1, res=1.05922e-06
+it=2, res=1.9842e-10
+it=3, res=6.53449e-13
+it=1, res=1.51752e-06
+it=2, res=4.03755e-10
+it=3, res=5.98634e-13
+it=1, res=2.18395e-06
+it=2, res=8.18019e-10
+it=3, res=4.11993e-13
+it=1, res=3.15694e-06
+it=2, res=1.65164e-09
+it=3, res=1.01893e-12
+it=1, res=4.59929e-06
+it=2, res=3.32749e-09
+...</pre><img vspace="5" hspace="5" src="rotsym_demo_08.png" alt=""> <h2>Plot all bifurcations of relative equilibria<a name="16"></a></h2><pre class="codeinput">getpar=@(ip,br)arrayfun(@(x)x.parameter(ip),br.point);
+ph=getpar(ind_phi,h1branch);
+eh=getpar(ind_eta,h1branch);
+pf=getpar(ind_phi,fold1branch);
+ef=getpar(ind_eta,fold1branch);
+pf2=getpar(ind_phi,fold2branch);
+ef2=getpar(ind_eta,fold2branch);
+figure(2);clf
+plot(ph,eh,<span class="string">'ro-'</span>, pf,ef,<span class="string">'b.-'</span>, pf2,ef2,<span class="string">'b.-'</span>);
+axis([-2,8,0,0.009]);
+grid <span class="string">on</span>
+set(gca,tdeco{:});
+xlabel(<span class="string">'phi'</span>,tdeco{:});
+ylabel(<span class="string">'eta'</span>,tdeco{:});
+</pre><img vspace="5" hspace="5" src="rotsym_demo_09.png" alt=""> <h2>Period doubling of relative POs<a name="17"></a></h2><p>The standard initialization works (wrapped to give it sensible name). The rotation speed needs to be added to the list of continuation parameters.</p><pre class="codeinput">ind_pd=find(diff(rw_phas_per_nunst)==1&amp;dom_per(1:end-1)&lt;0);
+[pdfuncs,pdbr]=SetupMWPeriodDoubling(rfuncs,rw_phas_per,ind_pd,<span class="keyword">...</span>
+    <span class="string">'contpar'</span>,[ind_phi,ind_eta,ind_omega],opt_inputs{:},<span class="keyword">...</span>
+    <span class="string">'print_residual_info'</span>,1,<span class="string">'dir'</span>,ind_eta,<span class="string">'step'</span>,1e-4);
+</pre><pre class="codeoutput">it=1, res=0.544434
+it=2, res=0.0117503
+it=3, res=7.96708e-06
+it=4, res=6.67635e-11
+it=1, res=0.021419
+it=2, res=6.5234e-09
+it=1, res=0.154902
+it=2, res=0.00731031
+it=3, res=8.8049e-06
+it=4, res=9.55255e-10
+it=1, res=0.00387263
+it=2, res=8.19995e-10
+</pre><pre class="codeinput">figure(2);
+pdbr=br_contn(pdfuncs,pdbr,20);
+pdbr=br_rvers(pdbr);
+pdbr=br_contn(pdfuncs,pdbr,20);
+</pre><pre class="codeoutput">it=1, res=0.0201666
+it=2, res=3.31718e-05
+it=3, res=6.2154e-10
+it=1, res=0.0253107
+it=2, res=5.9337e-05
+it=3, res=1.20822e-09
+it=1, res=0.0100943
+it=2, res=2.36606e-09
+it=1, res=0.0351951
+it=2, res=0.000102233
+it=3, res=2.5438e-09
+it=1, res=0.0370704
+it=2, res=0.00014216
+it=3, res=2.53427e-09
+it=1, res=0.0345254
+it=2, res=0.000130282
+it=3, res=3.54583e-09
+it=1, res=0.00839129
+it=2, res=2.19358e-09
+it=1, res=0.032157
+...</pre><img vspace="5" hspace="5" src="rotsym_demo_10.png" alt=""> <h2>Stability of orbits at the period doubling<a name="19"></a></h2><p>Here the stability includes the Floquet multiplier -1. Alternatively include -1 into the list in <tt>'locate_trivial'</tt>: <tt>'locate_trivial',@(p)[1,1,-1]</tt>.</p><pre class="codeinput">pdorbs=pdfuncs.get_comp(pdbr.point,<span class="string">'solution'</span>);
+[nunst_pd,dom,triv_defect,pdorbs]=GetStability(pdorbs,<span class="keyword">...</span>
+    <span class="string">'exclude_trivial'</span>,true,<span class="string">'locate_trivial'</span>,@(p)[1,1],<span class="string">'funcs'</span>,rfuncs); <span class="comment">%#ok&lt;*ASGLU&gt;</span>
+fprintf(<span class="string">'max error of Floquet mult close to -1: %g\n'</span>,max(abs(dom+1)));
+</pre><pre class="codeoutput">max error of Floquet mult close to -1: 5.32865e-05
+</pre><h2>Fold of relative POs<a name="20"></a></h2><p>Folds of RPOs require a modified initialization routine since the condition <tt>rot_cond</tt> needs to be applied to the derivative, too. This requires again the introduction of an artificial parameter (automatically appended to parameter vector).  Theuser has to add rotation speed to the list of continuation parameters.</p><pre class="codeinput">ind_mwf=find(diff(rw_phas_per_nunst)==1&amp;dom_per(1:end-1)&gt;0)+1;
+[pfoldfuncs,mwfoldbr]=SetupMWFold(rfuncs,rw_phas_per,ind_mwf(1),<span class="keyword">...</span>
+    <span class="string">'contpar'</span>,[ind_phi,ind_eta,ind_omega],opt_inputs{:},<span class="keyword">...</span>
+    <span class="string">'print_residual_info'</span>,1,<span class="string">'dir'</span>,ind_eta,<span class="string">'step'</span>,1e-4);
+</pre><pre class="codeoutput">it=1, res=0.00883104
+it=2, res=0.00131223
+it=3, res=6.64663e-06
+it=4, res=3.52906e-10
+it=1, res=0.0135664
+it=2, res=1.38763e-08
+it=3, res=3.10375e-12
+it=1, res=0.0485972
+it=2, res=0.00701452
+it=3, res=0.000235835
+it=4, res=1.89466e-07
+it=5, res=3.70301e-12
+it=1, res=0.00853501
+it=2, res=7.53072e-09
+</pre><pre class="codeinput">figure(2);
+mwfoldbr=br_contn(pfoldfuncs,mwfoldbr,80);
+mwfoldbr=br_rvers(mwfoldbr);
+mwfoldbr=br_contn(pfoldfuncs,mwfoldbr,60);
+</pre><pre class="codeoutput">it=1, res=0.0169774
+it=2, res=0.0101654
+it=3, res=0.0124415
+it=1, res=0.00469105
+it=2, res=1.00458e-05
+it=3, res=8.32561e-10
+it=1, res=0.00515276
+it=2, res=4.71748e-09
+it=1, res=0.0075479
+it=2, res=0.000335056
+it=3, res=4.59115e-06
+it=4, res=1.06217e-09
+it=1, res=0.010977
+it=2, res=1.25696
+it=3, res=0.369966
+it=4, res=0.0789973
+it=5, res=0.021356
+it=1, res=0.00103736
+it=2, res=2.3066e-05
+it=3, res=1.00884e-08
+...</pre><img vspace="5" hspace="5" src="rotsym_demo_11.png" alt=""> <h2>Stability of orbits at fold of RPOs<a name="22"></a></h2><p>Here the stability includes the Floquet multiplier -1. Alternatively include  another 1 into the list in <tt>'locate_trivial'</tt>: <tt>'locate_trivial',@(p)[1,1,1]</tt>.</p><pre class="codeinput">mwforbs=pfoldfuncs.get_comp(mwfoldbr.point,<span class="string">'solution'</span>);
+[nunst_mwf,dom,triv_defect,mwforbs]=GetStability(mwforbs,<span class="keyword">...</span>
+    <span class="string">'exclude_trivial'</span>,true,<span class="string">'locate_trivial'</span>,@(p)[1,1],<span class="string">'funcs'</span>,rfuncs);
+fprintf(<span class="string">'max error of Floquet mult close to -1: %g\n'</span>,max(abs(dom-1)));
+</pre><pre class="codeoutput">max error of Floquet mult close to -1: 0.30039
+</pre><pre class="codeinput">save(<span class="string">'LKbifs.mat'</span>);
+</pre><h2>re-plot all bifurcations<a name="24"></a></h2><pre class="codeinput">plot_2dbifs;
+</pre><img vspace="5" hspace="5" src="rotsym_demo_12.png" alt=""> <p class="footer"><br>
+      Published with MATLAB&reg; 7.14<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Demo of extension for rotational symmetry using Lang-Kobayashi equations
+%
+% The equation (modelling a laser subject to delayed coherent optical
+% feedback) is given as
+% 
+% $$E'(t)=[1+i\alpha]n(t)E(t)+\eta\exp(i\phi)E(t-\tau), \qquad
+%   n'(t)=\epsilon[p-n(t)-(2n(t)+1)\bar E(t)E(t)]$$
+% 
+% The main bifurcation parameters will be $\eta$ and $\phi$.
+%
+% *Warning* The functions for the extended systems determining relative
+% equilibria (rotating waves) and relative periodic orbits (modulated
+% waves), do not have support for user-provided system derivatves or
+% state-dependent delays!
+%
+% <html>
+% $Id: rotsym_demo.html 20 2014-04-11 19:27:33Z jan.sieber $
+% </html>
+%
+%% Load DDE-Biftool and extension into Path
+clear
+addpath('../../ddebiftool/',...
+    '../../ddebiftool_extra_psol/',...
+    '../../ddebiftool_utilities/',...
+    '../../ddebiftool_extra_rotsym');
+%% Problem definition using |set_rotfuncs|
+% In addition to the user-defined functions |set_rotfuncs| needs the
+% matrix |A| generating the rotation and (optional) the rotation as a
+% function $\phi\mapsto \exp(A\phi)$. Then the system is assumed to have
+% rotational symmetry $exp(A\phi)$ where |A| is anti-symmetric.
+A=[0,-1,0; 1,0,0; 0,0,0];
+expA=@(phi) [cos(phi), -sin(phi),0; sin(phi), cos(phi),0; 0,0,1];
+%% Initial values of parameters and parameter indices
+alpha=4;      % alpha factor
+pump=0.1;    % injection current
+epsilon=5e-3; % carrier relaxation time
+eta=5e-3;      % feedback strength
+phi0=0;      % feedback phase
+tau0=100;      % initial delay
+par=[pump,eta,phi0,tau0,alpha,epsilon];
+% indices
+ndim=3;
+ind_pump=1;
+ind_eta=2;
+ind_phi=3;
+ind_tau=4;
+ind_omega=length(par)+1;
+%% Right-hand side and call to |set_rotfuncs|
+f=@(x,p)LangKobayashi(x(1,1,:)+1i*x(2,1,:),x(1,2,:)+1i*x(2,2,:),x(3,1,:),...
+    p(5),p(ind_pump),p(ind_eta),p(ind_phi),p(6));
+rfuncs=set_rotfuncs('sys_rhs',f,'rotation',A,'exp_rotation',expA,...
+    'sys_tau',@()ind_tau,'x_vectorized',true);
+%% Extended functions in rotating coordinates for rotating waves
+% A rotating wave (relative equilibrium, RE) is a solution of the form
+%
+% $$ x(t)=\exp(A\omega t)x_0. $$
+%
+% The extended functions in |rfuncs| will always treat the user-provided
+% system in rotating coordinates.
+%
+% Original system (by user):
+%
+% $$x'(t)=f(x(t),x(t-\tau_1),...,x(t-\tau_n))$$
+%
+% Rotating coordinates: $x(t)=\exp(A\omega t)y(t)$:
+%
+% $$y'(t)=-A \omega y(t)+f(y(t),\exp(-A\omega\tau_1)y(t-\tau_1),\ldots,
+%    \exp(-A\omega\tau_n)y(t-\tau_n))$$
+%
+% The rotation speed is chosen such that the rotating wave
+% $x(t)=\exp(A\omega t)x_0$ is turned into an equilibrium $y(t)=y_0$. This
+% is achieved by solving for equilibria of the $y$ equation and adding a
+% |sys_cond| (file |rot_cond.m|) to povide an equation determining
+% $\omega$. For rotating waves this is
+%
+% $$ y_\mathrm{ref}^TAy=0 $$
+%
+% As DDE-Biftool does not give the user's |sys_cond| access to reference
+% points, |rot_cond| returns residual 0 and Jacobian $y_0^TA$.
+%% Initial guess
+% The extension for rotating and modulated waves is *not* able to cope with
+% invariant equilibria. Thus, we generate a non-trivial rotating wave as
+% our initial guess. For the laser the rotating waves correspond to
+% stationary lasing (on state) $E(t)=E_0\exp(i\omega t)$, $n=n_0$.
+[E0,n0,phi0,omega0]=LK_init(alpha,pump,eta,tau0);
+par(ind_phi)=phi0;
+par(ind_omega)=omega0;
+opt_inputs={'extra_condition',1,'print_residual_info',0};
+%% Relative equilibria varying phase |phi| of the delayed feedback
+% The standard convenience function |SetupStst| works, but one must add the
+% continuation parameter index |length(parameter)| to the index list of
+% continuation parameters.
+%
+% *Warning* DDE-Biftool assumes that the rotation speed is the last
+% parameter in the parameter vector!
+%
+rw_phas=SetupStst(rfuncs,'contpar',[ind_phi,ind_omega],'corpar',ind_omega,...
+    'x',[E0;n0],'parameter',par,opt_inputs{:},...
+    'max_step',[ind_phi,0.2]);
+figure(2);clf
+rw_phas=br_contn(rfuncs,rw_phas,200);
+%% Linear Stability of relative equilibria
+% The standard convenience function |GetStability| works. However, all
+% relative equilibria have a trivial eigenvalue 0, corresponding to phase
+% shift. If $x_0$ is a relative equilibrium (with rotation speed $\omega$)
+% then $\exp(A\rho)x_0$ is also a relative equilibrium with the same
+% rotation speed $\omega$. One can adapt |GetStability| by setting the
+% optional flag |exclude_trivial| to |true| and providing a function for
+% locating the trivial eigenvalue: |'locate_trivial',@(p)0|.
+[rw_phas_nunst,dom,defect,rw_phas.point]=GetStability(rw_phas,...
+    'exclude_trivial',true,'locate_trivial',@(p)0,'funcs',rfuncs);
+% plot with stability information
+p2=arrayfun(@(p)p.parameter(ind_phi),rw_phas.point);
+A2=arrayfun(@(p)norm(p.x(1:2)),rw_phas.point);
+n2=arrayfun(@(p)norm(p.x(3)),rw_phas.point);
+om2=arrayfun(@(p)p.parameter(ind_omega),rw_phas.point);
+figure(1);clf
+tdeco={'fontsize',14,'fontweight','bold'};
+sel=@(x,i)x(rw_phas_nunst==i);
+plot(sel(p2,0),sel(A2,0),'k.',sel(p2,1),sel(A2,1),'r.',...
+    sel(p2,2),sel(A2,2),'c.',sel(p2,3),sel(A2,3),'b.','linewidth',2);
+% detect Hopf bifurcations
+ind_hopf=find(abs(diff(rw_phas_nunst))==2);
+hold on
+plot(p2(ind_hopf),A2(ind_hopf),'ks','linewidth',2);
+hold off
+set(gca,tdeco{:});
+xlabel('phi',tdeco{:});
+ylabel('|E|',tdeco{:});
+%% Modulated waves (Relative periodic orbits, RPOs)
+% Modulated waves are solutions of the form
+%
+% $$ x(t)=\exp(A\omega t)x_0(t)$$
+%
+% where $x0(t)=x0(t-T)$ for all $t$ and some period $T$. That is, $x(t)$ is
+% quasi-periodic, but can be turned into a periodic solution in rotating
+% coordinates. The transformation to rotating coordinates is the same as
+% for relative equilibria, but the additional condition (|rot_cond|) is
+%
+% $$\int_0^1 y_\mathrm{ref}^TAy(t) \mathrm{d} t=0$$
+%
+% where $y_\mathrm{ref}(t)$ is a reference solution. Since DDE-Biftool does
+% not give access to reference solutions in user-defined conditions,
+% |rot_cond| returns residual 0 and Jacobian $y(t)^TA$.
+%% RPOs branching off at 2nd Hopf of REs
+% The initialization works with the standard routine. Again, the rotation
+% speed needs to be added to the list of continuation parameters.
+[rw_phas_per,suc]=SetupPsol(rfuncs,rw_phas,ind_hopf(2),opt_inputs{:},...
+    'max_step',[ind_phi,0.1],'print_residual_info',1,'radius',0.02);
+if ~suc
+    error('Hopf initialization failed');
+end
+figure(2);clf
+rw_phas_per=br_contn(rfuncs,rw_phas_per,120);
+%% Stability of RPOs
+% Similar to REs, the RPOs have an additional trivial Floquet multiplier 1.
+% That is, overall, RPOs have always a double Floquet multiplier 1. To
+% exclude the two Floquet mulitpliers closest to unity from the stability,
+% set the optional flag |'exclude_trivial'| to |true| and provide for the
+% optional argument |'locate_trivial'| the function |@(p)[1,1]|.
+[rw_phas_per_nunst,dom_per,defect,rw_phas_per.point]=GetStability(rw_phas_per,...
+    'exclude_trivial',true,'locate_trivial',@(p)[1,1],'funcs',rfuncs);
+% plot with stability info
+pp=arrayfun(@(p)p.parameter(ind_phi),rw_phas_per.point);
+Epow=@(x)sqrt(sum(x(1:2,:).^2,1));
+Apmx=arrayfun(@(p)max(Epow(p.profile)),rw_phas_per.point);
+Apmn=arrayfun(@(p)min(Epow(p.profile)),rw_phas_per.point);
+figure(1);hold on
+sel=@(x,i)x(rw_phas_per_nunst==i);
+plot(sel(pp,0),[sel(Apmx,0);sel(Apmn,0)],'ko',...
+    sel(pp,1),[sel(Apmx,1);sel(Apmn,1)],'ro');
+axis tight
+%% Plot of "phase portraits" of relative periodic orbits
+figure(2);clf;hold on
+for i=1:length(rw_phas_per.point)
+    plot(Epow(rw_phas_per.point(i).profile),rw_phas_per.point(i).profile(3,:),'.-');
+end
+hold off
+grid on
+axis tight
+set(gca,tdeco{:});
+xlabel('n',tdeco{:});
+ylabel('|E|',tdeco{:});
+%% Continuation of fold of relative equilibria
+% The functions for the extended system are generated by |SetupRWFold|. The
+% standard routine |SetupPOfold| has to be modified because the extended
+% condition |rot_cond| has to be applied to the derivative, too. Also the
+% rotation speed needs to be added to the list of continuation parameters.
+% The extended system for fold continuation of REs has one additional
+% artificial continuation parameter.
+ind_fold=find(abs(diff(rw_phas_nunst))==1);
+[foldfuncs,fold1branch,suc]=SetupRWFold(rfuncs,rw_phas,ind_fold(1),...
+    'contpar',[ind_phi,ind_eta,ind_omega],opt_inputs{:},...
+    'print_residual_info',1,'dir',ind_eta,'step',1e-4,...
+    'max_step',[ind_phi,0.1; ind_eta,0.01]);
+%
+figure(2);clf
+fold1branch=br_contn(foldfuncs,fold1branch,40);
+fold1branch=br_rvers(fold1branch);
+fold1branch=br_contn(foldfuncs,fold1branch,40);
+%% Continuation of 2nd fold of relative equilibria
+[foldfuncs,fold2branch,suc]=SetupRWFold(rfuncs,rw_phas,ind_fold(2),...
+    'contpar',[ind_phi,ind_eta,ind_omega],opt_inputs{:},...
+    'print_residual_info',1,'dir',ind_eta,'step',1e-4,...
+    'max_step',[ind_phi,0.1; ind_eta,0.01]);
+fold2branch=br_contn(foldfuncs,fold2branch,40);
+fold2branch=br_rvers(fold2branch);
+fold2branch=br_contn(foldfuncs,fold2branch,40);
+%% Continuation of Hopf bifurcations of relative equilibria
+% For Hopf bifurcation continuation the standard routine |SetupHopf| works
+% without modification (|SetupRWHopf| is a simple wrapper).
+[h1branch,suc]=SetupRWHopf(rfuncs,rw_phas,ind_hopf(1),...
+    'contpar',[ind_phi,ind_eta,ind_omega],opt_inputs{:},...
+    'print_residual_info',1,'dir',ind_eta,'step',1e-4,'minimal_accuracy',1e-4);
+h1branch=br_contn(rfuncs,h1branch,50);
+h1branch=br_rvers(h1branch);
+h1branch=br_contn(rfuncs,h1branch,50);
+%% Plot all bifurcations of relative equilibria
+getpar=@(ip,br)arrayfun(@(x)x.parameter(ip),br.point);
+ph=getpar(ind_phi,h1branch);
+eh=getpar(ind_eta,h1branch);
+pf=getpar(ind_phi,fold1branch);
+ef=getpar(ind_eta,fold1branch);
+pf2=getpar(ind_phi,fold2branch);
+ef2=getpar(ind_eta,fold2branch);
+figure(2);clf
+plot(ph,eh,'ro-', pf,ef,'b.-', pf2,ef2,'b.-');
+axis([-2,8,0,0.009]);
+grid on
+set(gca,tdeco{:});
+xlabel('phi',tdeco{:});
+ylabel('eta',tdeco{:});
+%% Period doubling of relative POs
+% The standard initialization works (wrapped to give it sensible name). The
+% rotation speed needs to be added to the list of continuation parameters.
+ind_pd=find(diff(rw_phas_per_nunst)==1&dom_per(1:end-1)<0);
+[pdfuncs,pdbr]=SetupMWPeriodDoubling(rfuncs,rw_phas_per,ind_pd,...
+    'contpar',[ind_phi,ind_eta,ind_omega],opt_inputs{:},...
+    'print_residual_info',1,'dir',ind_eta,'step',1e-4);
+%%
+figure(2);
+pdbr=br_contn(pdfuncs,pdbr,20);
+pdbr=br_rvers(pdbr);
+pdbr=br_contn(pdfuncs,pdbr,20);
+%% Stability of orbits at the period doubling
+% Here the stability includes the Floquet multiplier -1. Alternatively
+% include -1 into the list in |'locate_trivial'|:
+% |'locate_trivial',@(p)[1,1,-1]|.
+pdorbs=pdfuncs.get_comp(pdbr.point,'solution');
+[nunst_pd,dom,triv_defect,pdorbs]=GetStability(pdorbs,...
+    'exclude_trivial',true,'locate_trivial',@(p)[1,1],'funcs',rfuncs); %#ok<*ASGLU>
+fprintf('max error of Floquet mult close to -1: %g\n',max(abs(dom+1)));
+%% Fold of relative POs
+% Folds of RPOs require a modified initialization routine since the
+% condition |rot_cond| needs to be applied to the derivative, too. This
+% requires again the introduction of an artificial parameter (automatically
+% appended to parameter vector).  Theuser has to add rotation speed to the
+% list of continuation parameters.
+ind_mwf=find(diff(rw_phas_per_nunst)==1&dom_per(1:end-1)>0)+1;
+[pfoldfuncs,mwfoldbr]=SetupMWFold(rfuncs,rw_phas_per,ind_mwf(1),...
+    'contpar',[ind_phi,ind_eta,ind_omega],opt_inputs{:},...
+    'print_residual_info',1,'dir',ind_eta,'step',1e-4);
+%%
+figure(2);
+mwfoldbr=br_contn(pfoldfuncs,mwfoldbr,80);
+mwfoldbr=br_rvers(mwfoldbr);
+mwfoldbr=br_contn(pfoldfuncs,mwfoldbr,60);
+%% Stability of orbits at fold of RPOs
+% Here the stability includes the Floquet multiplier -1. Alternatively
+% include  another 1 into the list in |'locate_trivial'|:
+% |'locate_trivial',@(p)[1,1,1]|.
+mwforbs=pfoldfuncs.get_comp(mwfoldbr.point,'solution');
+[nunst_mwf,dom,triv_defect,mwforbs]=GetStability(mwforbs,...
+    'exclude_trivial',true,'locate_trivial',@(p)[1,1],'funcs',rfuncs);
+fprintf('max error of Floquet mult close to -1: %g\n',max(abs(dom-1)));
+%%
+save('LKbifs.mat');
+%% re-plot all bifurcations
+plot_2dbifs;
+
+##### SOURCE END #####
+--></body></html>
