@@ -1,0 +1,187 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Definition of user functions</title><meta name="generator" content="MATLAB 7.14"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2014-12-31"><meta name="DC.source" content="demo1_funcs.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+
+  </style></head><body><div class="content"><h1>Definition of user functions</h1><!--introduction--><p>
+(c) DDE-BIFTOOL v. 3.1.1(75), 31/12/2014
+</p><p>(Please load <tt>ddebiftool</tt> into path first, see <a href="demo1.html">demo1.html</a>.) To define a system, the user should provide Matlab functions defining the right-hand side (in the example called <tt>neuron_sys_rhs</tt>) and the indices for the delays in the parameter vector (called <tt>neuron_tau</tt> in our example).</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Right-hand side</a></li><li><a href="#2">Delays</a></li><li><a href="#3">Jacobians of user-provided functions</a></li><li><a href="#4">Definition of structure <tt>funcs</tt></a></li><li><a href="#5">Save and continue to continuation and stability of steady states <a href="demo1_stst.html">demo1_stst.html</a></a></li></ul></div><h2>Right-hand side<a name="1"></a></h2><p>A function defining the right-hand side <img src="demo1_funcs_eq85998.png" alt="$f$">:</p><pre class="language-matlab"><span class="keyword">function</span> y=sys_rhs(xx,par)
+</pre><p>This function has two arguments, <tt>xx</tt> <img src="demo1_funcs_eq45452.png" alt="$\in R^{n\times (m+1)}$">, which contains the state variable(s) at the present and in the past, <tt>xx</tt> <img src="demo1_funcs_eq21783.png" alt="$=[x(t), x(t-\tau_1), \ldots, x(t-\tau_m)]$">, <tt>par</tt> <img src="demo1_funcs_eq21304.png" alt="$\in R^{1\times p}$"> which contains the parameters, <tt>par</tt> <img src="demo1_funcs_eq13527.png" alt="$=\eta$">.</p><p>For the example, this is (<img src="demo1_funcs_eq85998.png" alt="$f$"> is called <tt>neuron_sys_rhs</tt> in our example)</p><pre class="codeinput">neuron_sys_rhs=@(xx,par)[<span class="keyword">...</span>
+    -par(1)*xx(1,1)+par(2)*tanh(xx(1,4))+par(3)*tanh(xx(2,3));<span class="keyword">...</span><span class="comment">.</span>
+    -par(1)*xx(2,1)+par(2)*tanh(xx(2,4))+par(4)*tanh(xx(1,2))];
+</pre><h2>Delays<a name="2"></a></h2><p>The delays <img src="demo1_funcs_eq61912.png" alt="$\tau_i$">, <img src="demo1_funcs_eq19140.png" alt="$i=1\ldots,m$"> are considered to be part of the parameters (<img src="demo1_funcs_eq48182.png" alt="$\tau_i=\eta_{j(i)}$">, <img src="demo1_funcs_eq76018.png" alt="$i=1,\ldots,m$">). This is natural since the stability of steady solutions and the position and stability of periodic solutions depend  on the values of the delays. Furthermore delays can occur both as a 'physical' parameter and as delay, as in <img src="demo1_funcs_eq99132.png" alt="$\dot{x}=\tau x(t-\tau)$">. From these inputs the right-hand side <img src="demo1_funcs_eq85998.png" alt="$f$"> is evaluated at time <img src="demo1_funcs_eq07064.png" alt="$t$">. For equations with constant delays DDE-Biftool determines which parameters are delays by calling an argument-less function of the type</p><pre class="language-matlab"><span class="keyword">function</span> d=sys_tau()
+</pre><p>In the example we order the parameters as <tt>par</tt> <img src="demo1_funcs_eq56913.png" alt="$=[\kappa, \beta, a_{12}, a_{21},\tau_1,\tau_2, \tau_s]$">. Thus, (giving it the name <tt>neuron_tau</tt>):</p><pre class="codeinput">neuron_tau=@()[5,6,7];
+ind_a21=4;  <span class="comment">% used later for continuation</span>
+ind_taus=7; <span class="comment">% used later for continuation</span>
+</pre><h2>Jacobians of user-provided functions<a name="3"></a></h2><p>Optionally (recommended) the user may also specify the partial derivatives of the user-defined functions with respect to states, delayed states and parameters. For constant delays only the derivatives of <img src="demo1_funcs_eq85998.png" alt="$f$"> are required. They should be provided as a function of the form</p><pre class="language-matlab"><span class="keyword">function</span> J=sys_deri(xx,par,nx,np,v)
+</pre><p>providing the partial derivatives of first and second order (see file <a href="neuron_sys_deri.html">neuron_sys_deri.html</a> for details).</p><h2>Definition of structure <tt>funcs</tt><a name="4"></a></h2><p>Similar to standard functions such as <tt>ode45</tt> DDE-Biftool's routines now have an argument that defines the right-hand side. Since DDE-Biftool needs several user-defined functions (sys_rhs, sys_tau, optionally sys_deri, sys_cond etc) these functions are collected in a structure <tt>funcs</tt>. This structure <tt>funcs</tt> is best set up by calling the (new) DDE-Biftool routine <tt>set_funcs</tt> wit a sequence of name-value pairs. Each name-value pair corresponds to a field in the structure. Fields that are not listed as arguments of set_funcs get replaced by a default if possible.</p><p>Possible argument names are:</p><div><ul><li><tt>'sys_rhs'</tt> (default <tt>sys_rhs</tt> if file <tt>sys_rhs.m</tt> present in folder):    right-hand side <tt>sys_tau</tt></li><li><tt>'sys_tau'</tt> (default <tt>@()[]</tt>): function defining delays</li><li><tt>'sys_deri'</tt> (default <tt>@df_deriv</tt>): function defining partial derivatives   of <tt>sys_rhs</tt></li><li><tt>'sys_ntau'</tt> (default 0, only needed for state-dependent delays) number    of delays</li><li><tt>'sys_cond'</tt> (default <tt>@dummy_cond</tt>) function providing extra conditions</li><li><tt>'sys_dtau'</tt> (default <tt>@df_derit</tt>, only needed for state-dependent    delays): function defining partial derivatives of <tt>sys_tau</tt></li><li><tt>'x_vectorized'</tt> (logical, default false) set to true if <tt>sys_rhs</tt>,    <tt>sys_deri</tt>, (<tt>sys_tau</tt> and <tt>sys_dtau</tt> for SD-DDEs) accept an argument <tt>xx</tt> with three    dimensions. For periodic-orbit computations the function will be    called with all collocation points simultaneously if <tt>x_vectorized</tt> is    true.</li></ul></div><p>Other fields are <tt>tp_del</tt> (true if delays are state-dependent), <tt>sys_deri_provided</tt> (true if user has provided <tt>sys_deri</tt>) and <tt>sys_dtau_provided</tt> (true if user has provided <tt>sys_dtau</tt>).</p><pre class="codeinput">funcs=set_funcs(<span class="keyword">...</span>
+    <span class="string">'sys_rhs'</span>,neuron_sys_rhs,<span class="keyword">...</span>
+    <span class="string">'sys_tau'</span>,@()[5,6,7],<span class="keyword">...</span>
+    <span class="string">'sys_deri'</span>,@neuron_sys_deri) <span class="comment">%#ok&lt;NOPTS&gt;</span>
+</pre><pre class="codeoutput">funcs = 
+                sys_rhs: [function_handle]
+               sys_ntau: @()0
+                sys_tau: @()[5,6,7]
+               sys_cond: @dummy_cond
+               sys_deri: @neuron_sys_deri
+               sys_dtau: @(it,x,p,nx,np)df_derit(funcs,it,x,p,nx,np)
+             sys_mfderi: [function_handle]
+           x_vectorized: 0
+                 tp_del: 0
+      sys_deri_provided: 1
+      sys_dtau_provided: 0
+    sys_mfderi_provided: 0
+</pre><h2>Save and continue to continuation and stability of steady states <a href="demo1_stst.html">demo1_stst.html</a><a name="5"></a></h2><pre class="codeinput">save(<span class="string">'demo1_funcs_results.mat'</span>);
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.14<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Definition of user functions
+%
+% <html>
+% $Id: demo1_funcs.html 75 2014-12-31 11:52:05Z jan.sieber $
+% </html>
+%
+% (Please load |ddebiftool| into path first, see <demo1.html>.)
+% To define a system, the user should provide Matlab functions defining the
+% right-hand side (in the example called |neuron_sys_rhs|) and the indices
+% for the delays in the parameter vector (called |neuron_tau| in our
+% example).
+%% Right-hand side
+% A function defining the right-hand side $f$:
+% 
+%   function y=sys_rhs(xx,par)
+% 
+% This function has two arguments, |xx| $\in R^{n\times (m+1)}$, which contains 
+% the state variable(s) at the present and in the past,
+% |xx| $=[x(t), x(t-\tau_1), \ldots, x(t-\tau_m)]$,
+% |par| $\in R^{1\times p}$ which contains the parameters, |par| $=\eta$.
+%
+% For the example, this is ($f$ is called |neuron_sys_rhs| in our example)
+neuron_sys_rhs=@(xx,par)[...
+    -par(1)*xx(1,1)+par(2)*tanh(xx(1,4))+par(3)*tanh(xx(2,3));....
+    -par(1)*xx(2,1)+par(2)*tanh(xx(2,4))+par(4)*tanh(xx(1,2))];
+
+%% Delays
+% The delays $\tau_i$, $i=1\ldots,m$ are considered to be part of the
+% parameters ($\tau_i=\eta_{j(i)}$, $i=1,\ldots,m$). This is natural since
+% the stability of steady solutions and the position and stability of
+% periodic solutions depend  on the values of the delays. Furthermore
+% delays can occur both as a 'physical' parameter and as delay, as in
+% $\dot{x}=\tau x(t-\tau)$. From these inputs the right-hand side $f$ is
+% evaluated at time $t$. For equations with constant delays DDE-Biftool
+% determines which parameters are delays by calling an argument-less
+% function of the type
+%
+%   function d=sys_tau()
+%
+% In the example we order the parameters as |par| $=[\kappa,
+% \beta, a_{12}, a_{21},\tau_1,\tau_2, \tau_s]$. Thus, (giving it the name
+% |neuron_tau|):
+neuron_tau=@()[5,6,7];
+ind_a21=4;  % used later for continuation
+ind_taus=7; % used later for continuation
+
+%% Jacobians of user-provided functions
+% Optionally (recommended) the user may also specify the partial
+% derivatives of the user-defined functions with respect to states, delayed
+% states and parameters. For constant delays only the derivatives of $f$
+% are required. They should be provided as a function of the form
+%
+%   function J=sys_deri(xx,par,nx,np,v)
+%
+% providing the partial derivatives of first and second order (see file
+% <neuron_sys_deri.html> for details).
+%
+%% Definition of structure |funcs|
+% Similar to standard functions such as |ode45| DDE-Biftool's routines now
+% have an argument that defines the right-hand side. Since DDE-Biftool
+% needs several user-defined functions (sys_rhs, sys_tau, optionally
+% sys_deri, sys_cond etc) these functions are collected in a structure
+% |funcs|. This structure |funcs| is best set up by calling the (new)
+% DDE-Biftool routine |set_funcs| wit a sequence of name-value pairs. Each
+% name-value pair corresponds to a field in the structure. Fields that are
+% not listed as arguments of set_funcs get replaced by a default if
+% possible.
+%
+% Possible argument names are:
+% 
+% * |'sys_rhs'| (default |sys_rhs| if file |sys_rhs.m| present in folder):
+%    right-hand side |sys_tau|
+% * |'sys_tau'| (default |@()[]|): function defining delays
+% * |'sys_deri'| (default |@df_deriv|): function defining partial derivatives
+%   of |sys_rhs|
+% * |'sys_ntau'| (default 0, only needed for state-dependent delays) number
+%    of delays
+% * |'sys_cond'| (default |@dummy_cond|) function providing extra conditions
+% * |'sys_dtau'| (default |@df_derit|, only needed for state-dependent
+%    delays): function defining partial derivatives of |sys_tau|
+% * |'x_vectorized'| (logical, default false) set to true if |sys_rhs|,
+%    |sys_deri|, (|sys_tau| and |sys_dtau| for SD-DDEs) accept an argument |xx| with three
+%    dimensions. For periodic-orbit computations the function will be
+%    called with all collocation points simultaneously if |x_vectorized| is
+%    true.
+%
+% Other fields are |tp_del| (true if delays are state-dependent),
+% |sys_deri_provided| (true if user has provided |sys_deri|) and
+% |sys_dtau_provided| (true if user has provided |sys_dtau|).
+funcs=set_funcs(...
+    'sys_rhs',neuron_sys_rhs,...
+    'sys_tau',@()[5,6,7],...
+    'sys_deri',@neuron_sys_deri) %#ok<NOPTS>
+%% Save and continue to continuation and stability of steady states <demo1_stst.html>
+save('demo1_funcs_results.mat');
+
+##### SOURCE END #####
+--></body></html>
